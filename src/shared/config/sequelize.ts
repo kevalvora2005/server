@@ -18,7 +18,13 @@ export const sequelize = new Sequelize({
     max: 20,
     idle: 30000,
     acquire: 30000,
-  }
+  },
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
 });
 
 // export const sequelize = new Sequelize(env.DATABASE_URL!, {

@@ -4,9 +4,9 @@ import { UserRole } from '../../domain/entities/User';
 
 export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
   declare id: CreationOptional<number>;
+  declare cognitoSub: CreationOptional<string | null>;
   declare name: string;
   declare email: string;
-  declare passwordHash: string;
   declare phone: string;
   declare role: UserRole;
   declare isActive: CreationOptional<boolean>;
@@ -22,6 +22,12 @@ UserModel.init(
       primaryKey: true,
       autoIncrement: true,
     },
+    cognitoSub: {
+      type: DataTypes.STRING(64),
+      allowNull: true,
+      unique: true,
+      field: 'cognito_sub',
+    },
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,
@@ -33,11 +39,6 @@ UserModel.init(
       validate: {
         isEmail: true,
       },
-    },
-    passwordHash: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-      field: 'password_hash',
     },
     phone: {
       type: DataTypes.STRING(15),
@@ -71,6 +72,6 @@ UserModel.init(
   {
     sequelize,
     tableName: 'users',
-    underscored: true, // Automatically applies snake_case to implicit timestamps/foreign keys if needed
+    underscored: true,
   }
 );

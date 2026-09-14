@@ -1,6 +1,6 @@
 import { UserRepository } from "../auth/infrastructure/repositories/UserRepository";
-import { BcryptPasswordHasher } from "../auth/infrastructure/services/BcryptPasswordHasher";
 import { NodemailerEmailService } from "../auth/infrastructure/services/NodemailerEmailService";
+import { CognitoAuthService } from "../auth/infrastructure/services/CognitoAuthService";
 import { CreateResidentUseCase } from "./application/use-cases/CreateResidentUseCase";
 import { DeactivateResidentUseCase } from "./application/use-cases/DeactivateResidentUseCase";
 import { GetResidentUseCase } from "./application/use-cases/GetResidentUseCase";
@@ -12,18 +12,16 @@ import { PromoteOccupantsJob } from "./application/jobs/PromoteOccupantsJob";
 import { ResidentRepository } from "./infrastructure/repositories/ResidentRepository";
 import { ResidentController } from "./presentation/controllers/ResidentController";
 
-// Repositories & Services
 const residentRepository = new ResidentRepository();
 const userRepository = new UserRepository();
-const passwordHasher = new BcryptPasswordHasher();
 const emailService = new NodemailerEmailService();
+const cognitoAuthService = new CognitoAuthService();
 
-// Use Cases
 const createResidentUseCase = new CreateResidentUseCase(
   residentRepository,
   userRepository,
-  passwordHasher,
-  emailService
+  emailService,
+  cognitoAuthService
 );
 
 const getResidentUseCase = new GetResidentUseCase(
@@ -51,16 +49,14 @@ const listApartmentTenantsUseCase = new ListApartmentTenantsUseCase(
 const importResidentsUseCase = new ImportResidentsUseCase(
   residentRepository,
   userRepository,
-  passwordHasher,
-  emailService
+  emailService,
+  cognitoAuthService
 );
 
-// Scheduled Job (exported so shared/jobs/scheduler.ts can register it)
 export const promoteOccupantsJob = new PromoteOccupantsJob(
   residentRepository
 );
 
-// Controller
 export const residentController = new ResidentController(
   createResidentUseCase,
   getResidentUseCase,

@@ -2,8 +2,8 @@ import { TenantRequestRepository } from "./infrastructure/repositories/TenantReq
 import { TenantRequestVoteRepository } from "./infrastructure/repositories/TenantRequestVoteRepository";
 import { UserRepository } from "../auth/infrastructure/repositories/UserRepository";
 import { PasswordResetTokenRepository } from "../auth/infrastructure/repositories/PasswordResetTokenRepository";
-import { BcryptPasswordHasher } from "../auth/infrastructure/services/BcryptPasswordHasher";
 import { NodemailerEmailService } from "../auth/infrastructure/services/NodemailerEmailService";
+import { CognitoAuthService } from "../auth/infrastructure/services/CognitoAuthService";
 
 import { SubmitTenantRequestUseCase } from "./application/use-cases/SubmitTenantRequestUseCase";
 import { BulkRecordVotesUseCase } from "./application/use-cases/BulkRecordVotesUseCase";
@@ -20,8 +20,8 @@ const residentRepository = new ResidentRepository();
 const userRepository = new UserRepository();
 const visitorRepository = new VisitorRepository();
 const passwordResetTokenRepository = new PasswordResetTokenRepository();
-const passwordHasher = new BcryptPasswordHasher();
 const emailService = new NodemailerEmailService();
+const cognitoAuthService = new CognitoAuthService();
 
 const submitTenantRequestUseCase = new SubmitTenantRequestUseCase(tenantRequestRepository, residentRepository, userRepository);
 const bulkRecordVotesUseCase = new BulkRecordVotesUseCase(tenantRequestRepository, tenantRequestVoteRepository, residentRepository, userRepository);
@@ -31,8 +31,8 @@ const finalizeTenantRequestUseCase = new FinalizeTenantRequestUseCase(
   residentRepository,
   userRepository,
   passwordResetTokenRepository,
-  passwordHasher,
   emailService,
+  cognitoAuthService
 );
 const revokeTenancyUseCase = new RevokeTenancyUseCase(residentRepository, userRepository, visitorRepository, emailService);
 

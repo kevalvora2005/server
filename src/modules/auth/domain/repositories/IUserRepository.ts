@@ -6,6 +6,8 @@ export interface IUserRepository {
 
   findByEmail(email: string): Promise<User | null>;
 
+  findByCognitoSub(cognitoSub: string): Promise<User | null>;
+
   findByPhone(phone: string): Promise<User | null>;
 
   findAllByRole(role: UserRole): Promise<User[]>;

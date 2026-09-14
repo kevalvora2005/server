@@ -1,13 +1,11 @@
 import { Router } from "express";
 import { tenantRequestController } from "../../container";
-import { createJwtMiddleware } from "../../../../shared/middleware/jwtMiddleware";
-import { JwtTokenService } from "../../../auth/infrastructure/services/JwtTokenService";
+import { jwtMiddleware } from "../../../../shared/middleware/jwtMiddleware";
 import { rbacMiddleware } from "../../../../shared/middleware/rbacMiddleware";
 import { UserRole } from "../../../auth/domain/entities/User";
 import { validateSubmitTenantRequest, validateBulkRecordVotes } from "../validators/tenantRequestValidators";
 
 const router = Router();
-const jwtMiddleware = createJwtMiddleware(new JwtTokenService());
 
 /*
 |--------------------------------------------------------------------------

@@ -8,7 +8,7 @@ export class UserAlreadyExistsError extends AppError {
 
 export class InvalidCredentialsError extends AppError {
   constructor() {
-    super("Invalid email or password", 401);
+    super("Invalid credentials", 401);
   }
 }
 

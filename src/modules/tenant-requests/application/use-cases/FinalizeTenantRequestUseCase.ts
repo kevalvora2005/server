@@ -5,7 +5,6 @@ import { IUserRepository } from "../../../auth/domain/repositories/IUserReposito
 import { IPasswordResetTokenRepository } from "../../../auth/domain/repositories/IPasswordResetTokenRepository";
 import { IEmailService } from "../../../auth/domain/services/IEmailService";
 import { User, UserRole } from "../../../auth/domain/entities/User";
-import { IPasswordHasher } from "../../../auth/domain/services/IPasswordHasher";
 import { FinalizeTenantRequestDto } from "../dtos/FinalizeTenantRequestDto";
 import {
   TenantRequestNotFoundError,
@@ -19,6 +18,8 @@ import { VotingEngine } from "../../../../shared/voting";
 import { buildWelcomeEmailTemplate } from "../../../residents/application/templates/welcomeEmailTemplate";
 import { ApartmentModel } from "../../../apartments/infrastructure/models/ApartmentModel";
 import { generateRandomPassword } from "../../../../shared/utils/generateRandomPassword";
+import { CognitoAuthService } from "../../../auth/infrastructure/services/CognitoAuthService";
+import { AppError } from "../../../../shared/errors/AppError";
 
 export interface FinalizeResult {
   request: TenantRequest;
@@ -33,8 +34,8 @@ export class FinalizeTenantRequestUseCase {
     private readonly residentRepository: IResidentRepository,
     private readonly userRepository: IUserRepository,
     private readonly passwordResetTokenRepository: IPasswordResetTokenRepository,
-    private readonly passwordHasher: IPasswordHasher,
     private readonly emailService: IEmailService,
+    private readonly cognitoAuthService: CognitoAuthService
   ) { }
 
   async execute(dto: FinalizeTenantRequestDto): Promise<FinalizeResult> {
@@ -62,7 +63,6 @@ export class FinalizeTenantRequestUseCase {
       throw new VotingNotCompleteError();
     }
 
-    // Total expected votes = committee members + admin (if admin voted)
     const expectedVotes = totalCommitteeSize + (adminTally.total > 0 ? 1 : 0);
     const totalVotes = tally.total + adminVotes;
 
@@ -97,25 +97,37 @@ export class FinalizeTenantRequestUseCase {
     request.approve();
     const updatedRequest = await this.tenantRequestRepository.update(request);
 
-    // Generate random 11-char temporary password
     const rawPassword = generateRandomPassword(11);
-    const passwordHash = await this.passwordHasher.hash(rawPassword);
 
-    // Reuse a dormant User with the same email when one exists, otherwise create new account
     const existingUser = await this.userRepository.findByEmail(request.tenantEmail);
+    let cognitoSub: string | undefined = existingUser?.cognitoSub || undefined;
+    if (!cognitoSub) {
+      try {
+        cognitoSub = await this.cognitoAuthService.adminCreateUser(
+          request.tenantEmail,
+          request.tenantName,
+          request.tenantPhone,
+          UserRole.RESIDENT,
+          rawPassword
+        );
+      } catch (error: any) {
+        throw new AppError(error.message || "Failed to create user in identity provider", 400);
+      }
+    }
+
     let savedTenantUser: User;
     if (existingUser) {
-      existingUser.updatePassword(passwordHash);
       existingUser.updatePhone(request.tenantPhone);
+      if (cognitoSub) existingUser.setCognitoSub(cognitoSub);
       existingUser.reactivate();
       existingUser.requirePasswordReset();
       savedTenantUser = await this.userRepository.update(existingUser);
     } else {
       const tenantUser = User.create({
+        cognitoSub,
         name: request.tenantName,
         email: request.tenantEmail,
         phone: request.tenantPhone,
-        passwordHash,
         role: UserRole.RESIDENT,
         mustResetPassword: true,
       });
@@ -123,7 +135,6 @@ export class FinalizeTenantRequestUseCase {
       savedTenantUser = await this.userRepository.create(tenantUser);
     }
 
-    // Reuse the Resident row tied to that user when present
     const existingResident = await this.residentRepository.findByUserId(savedTenantUser.id!);
     let savedTenantResident: Resident;
     if (existingResident) {
@@ -167,7 +178,6 @@ export class FinalizeTenantRequestUseCase {
       );
     }
 
-    // Build unit label e.g. A-101 for welcome email template
     let unitName = "Your Apartment";
     if (request.apartmentId) {
       const apartment = await ApartmentModel.findByPk(request.apartmentId);
@@ -176,7 +186,6 @@ export class FinalizeTenantRequestUseCase {
       }
     }
 
-    // Send welcome email with credentials & identical template as resident creation/import
     const { subject, html } = buildWelcomeEmailTemplate({
       name: request.tenantName,
       email: savedTenantUser.email,

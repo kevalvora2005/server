@@ -26,6 +26,18 @@ export class UserRepository implements IUserRepository {
     return this.toEntity(userModel);
   }
 
+  async findByCognitoSub(cognitoSub: string): Promise<User | null> {
+    const userModel = await UserModel.findOne({
+      where: { cognitoSub },
+    });
+
+    if (!userModel) {
+      return null;
+    }
+
+    return this.toEntity(userModel);
+  }
+
   async findByPhone(phone: string): Promise<User | null> {
     const userModel = await UserModel.findOne({
       where: { phone },
@@ -45,9 +57,9 @@ export class UserRepository implements IUserRepository {
 
   async create(user: User): Promise<User> {
     const createdModel = await UserModel.create({
+      cognitoSub: user.cognitoSub,
       name: user.name,
       email: user.email,
-      passwordHash: user.passwordHash,
       phone: user.phone,
       role: user.role,
       isActive: user.isActive,
@@ -64,13 +76,13 @@ export class UserRepository implements IUserRepository {
 
     const [affectedCount] = await UserModel.update(
       {
+        cognitoSub: user.cognitoSub,
         name: user.name,
         email: user.email,
         phone: user.phone,
         role: user.role,
         isActive: user.isActive,
         mustResetPassword: user.mustResetPassword,
-        passwordHash: user.passwordHash,
       },
       {
         where: { id: user.id },
@@ -95,9 +107,9 @@ export class UserRepository implements IUserRepository {
   private toEntity(model: UserModel): User {
     return new User({
       id: model.id,
+      cognitoSub: model.cognitoSub,
       name: model.name,
       email: model.email,
-      passwordHash: model.passwordHash,
       phone: model.phone,
       role: model.role,
       isActive: model.isActive,

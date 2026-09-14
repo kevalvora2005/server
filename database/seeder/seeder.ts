@@ -5,7 +5,6 @@ import { ApartmentModel } from "../../src/modules/apartments/infrastructure/mode
 import { VehicleModel } from "../../src/modules/vehicles/infrastructure/models/VehicleModel";
 import { UserRole } from "../../src/modules/auth/domain/entities/User";
 import { ApartmentType } from "../../src/modules/apartments/domain/entities/Apartment";
-import { BcryptPasswordHasher } from "../../src/modules/auth/infrastructure/services/BcryptPasswordHasher";
 import { VehicleType, FuelType } from "../../src/modules/vehicles/domain/entities/Vehicle";
 import { FamilyMemberModel } from "../../src/modules/family-members/infrastructure/models/FamilyMemberModel";
 import { NoticeModel } from "../../src/modules/notices/infrastructure/models/NoticeModel";
@@ -19,6 +18,7 @@ import { InvoiceModel } from "../../src/modules/maintenance/infrastructure/model
 import { InvoiceStatus } from "../../src/modules/maintenance/domain/entities/Invoice";
 import { AmenityModel } from "../../src/modules/amenities/infrastructure/models/AmenityModel";
 import { AmenityBookingType } from "../../src/modules/amenities/domain/entities/Amenity";
+import { CognitoAuthService } from "../../src/modules/auth/infrastructure/services/CognitoAuthService";
 
 const apartments = [
   { block: "A", floorNumber: 1, unitNumber: "01", areaSqft: 850, type: ApartmentType.ONE_BHK },
@@ -84,45 +84,73 @@ const vehicles = [
 
 const seedDefaultUsers = async (): Promise<void> => {
   try {
-    const userCount = await UserModel.count();
-
-    if (userCount > 0) {
-      console.log("[Database Seeder]: Users table already has data. Skipping user seeding.");
-      return;
-    }
-
-    console.log("[Database Seeder]: Users table is empty. Generating default users...");
-
-    const passwordHasher = new BcryptPasswordHasher();
+    const cognitoAuthService = new CognitoAuthService();
 
     const users = [
       {
         name: "System Administrator",
         email: "admin@yopmail.com",
         password: "Admin@123",
-        phone: "0000000000",
+        phone: "+910000000000",
         role: UserRole.ADMIN,
       },
       {
         name: "Security Guard",
         email: "security@yopmail.com",
         password: "Security@123",
-        phone: "0000000002",
+        phone: "+910000000002",
         role: UserRole.SECURITY,
       },
     ];
 
     for (const user of users) {
-      const hashedPassword = await passwordHasher.hash(user.password);
+      let cognitoSub: string | null = null;
+      try {
+        cognitoSub = await cognitoAuthService.adminCreateUser(
+          user.email,
+          user.name,
+          user.phone,
+          user.role,
+          user.password
+        );
+        try {
+          await cognitoAuthService.adminSetUserPassword(user.email, user.password);
+        } catch {
+        }
+      } catch (error: any) {
+        cognitoSub = await cognitoAuthService.adminGetUser(user.email);
+        if (!cognitoSub) {
+          try {
+            const tokens = await cognitoAuthService.login(user.email, user.password);
+            const payload = JSON.parse(Buffer.from(tokens.idToken.split(".")[1], "base64").toString());
+            cognitoSub = payload.sub || null;
+          } catch (err) {
+            console.error(`[Database Seeder]: Failed to resolve Cognito user for ${user.email}:`, err);
+          }
+        }
+      }
+
+      const existingUser = await UserModel.findOne({ where: { email: user.email } });
+      if (existingUser) {
+        if ((!existingUser.cognitoSub && cognitoSub) || existingUser.phone !== user.phone) {
+          await existingUser.update({
+            cognitoSub: cognitoSub || existingUser.cognitoSub,
+            phone: user.phone,
+          });
+          console.log(`[Database Seeder]: Linked cognitoSub (${cognitoSub}) for ${user.email}`);
+        }
+        continue;
+      }
+
       await UserModel.create({
+        cognitoSub,
         name: user.name,
         email: user.email,
-        passwordHash: hashedPassword,
         phone: user.phone,
         role: user.role,
         isActive: true,
       });
-      console.log(`[Database Seeder]: Created ${user.role} — ${user.email}`);
+      console.log(`[Database Seeder]: Created ${user.role} — ${user.email} (sub: ${cognitoSub})`);
     }
 
     console.log("[Database Seeder]: Default users successfully seeded!");
@@ -156,8 +184,6 @@ const seedResidents = async (): Promise<void> => {
     }
 
     console.log("[Database Seeder]: Seeding resident users...");
-    const passwordHasher = new BcryptPasswordHasher();
-    const hashedPassword = await passwordHasher.hash("Resident@123");
 
     const allApartments = await ApartmentModel.findAll({
       attributes: ["id"],
@@ -174,7 +200,6 @@ const seedResidents = async (): Promise<void> => {
         name: r.name,
         email: r.email,
         phone: r.phone,
-        passwordHash: hashedPassword,
         role: UserRole.RESIDENT,
         isActive: true,
       });

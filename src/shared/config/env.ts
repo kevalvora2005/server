@@ -23,18 +23,6 @@ export const env = {
   DATABASE_URL:
     process.env.DATABASE_URL,
 
-  JWT_ACCESS_SECRET:
-    process.env.JWT_ACCESS_SECRET!,
-
-  JWT_REFRESH_SECRET:
-    process.env.JWT_REFRESH_SECRET!,
-
-  JWT_ACCESS_EXPIRES_IN:
-    process.env.JWT_ACCESS_EXPIRES_IN || "15m",
-
-  JWT_REFRESH_EXPIRES_IN:
-    process.env.JWT_REFRESH_EXPIRES_IN || "7d",
-
   SMTP_HOST:
     process.env.SMTP_HOST,
 
@@ -67,4 +55,19 @@ export const env = {
 
   SOCIETY_ADDRESS:
     process.env.SOCIETY_ADDRESS || "123 Main St, City, Country",
+
+  AWS_REGION:
+    process.env.AWS_REGION || "ap-south-1",
+
+  COGNITO_USER_POOL_ID:
+    process.env.COGNITO_USER_POOL_ID || "",
+
+  COGNITO_CLIENT_ID:
+    process.env.COGNITO_CLIENT_ID || "",
+
+  AWS_ACCESS_KEY_ID:
+    process.env.AWS_ACCESS_KEY_ID || "",
+
+  AWS_SECRET_ACCESS_KEY:
+    process.env.AWS_SECRET_ACCESS_KEY || "",
 };

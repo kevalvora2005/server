@@ -2,8 +2,7 @@ import { Router } from "express";
 
 import { authController } from "../../container";
 
-import { createJwtMiddleware } from "../../../../shared/middleware/jwtMiddleware";
-import { JwtTokenService } from "../../infrastructure/services/JwtTokenService";
+import { jwtMiddleware } from "../../../../shared/middleware/jwtMiddleware";
 
 import { rbacMiddleware } from "../../../../shared/middleware/rbacMiddleware";
 import { UserRole } from "../../domain/entities/User";
@@ -18,8 +17,6 @@ import {
 } from '../validators/authValidators';
 
 const router = Router();
-
-const jwtMiddleware = createJwtMiddleware(new JwtTokenService());
 
 /*
 |--------------------------------------------------------------------------

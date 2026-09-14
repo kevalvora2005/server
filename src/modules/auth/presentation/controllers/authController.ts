@@ -80,8 +80,12 @@ export class AuthController {
   ): Promise<void> => {
     try {
       const refreshToken = req.body.refreshToken;
+      const authHeader = req.headers.authorization;
+      const accessToken = authHeader?.startsWith("Bearer ")
+        ? authHeader.substring(7)
+        : undefined;
 
-      await this.logoutUseCase.execute(refreshToken);
+      await this.logoutUseCase.execute(refreshToken, accessToken);
 
       res.status(200).json(
         ApiResponse.success({ message: "Logged out successfully" })

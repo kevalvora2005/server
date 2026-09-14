@@ -1,17 +1,17 @@
-import { IRefreshTokenRepository } from "../../domain/repositories/IRefreshTokenRepository";
+import { CognitoAuthService } from "../../infrastructure/services/CognitoAuthService";
 
 export class LogoutUseCase {
   constructor(
-    private readonly refreshTokenRepository: IRefreshTokenRepository
-  ) {}
+    private readonly cognitoAuthService: CognitoAuthService
+  ) { }
 
-  async execute(refreshToken: string): Promise<void> {
-    // Graceful early exit: If there's no token, there's nothing to delete
-    if (!refreshToken) {
-      return;
+  async execute(refreshToken?: string, accessToken?: string): Promise<void> {
+    if (accessToken) {
+      await this.cognitoAuthService.logout(accessToken);
     }
 
-    // Invalidate the session by purging the token from the database
-    await this.refreshTokenRepository.deleteByToken(refreshToken);
+    if (refreshToken) {
+      await this.cognitoAuthService.revokeToken(refreshToken);
+    }
   }
 }

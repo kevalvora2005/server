@@ -6,9 +6,9 @@ export enum UserRole {
 
 export interface UserProps {
   id?: number;
+  cognitoSub?: string | null;
   name: string;
   email: string;
-  passwordHash: string;
   phone: string;
   role: UserRole;
   isActive: boolean;
@@ -40,16 +40,16 @@ export class User {
     return this.props.id;
   }
 
+  get cognitoSub(): string | null | undefined {
+    return this.props.cognitoSub;
+  }
+
   get name(): string {
     return this.props.name;
   }
 
   get email(): string {
     return this.props.email;
-  }
-
-  get passwordHash(): string {
-    return this.props.passwordHash;
   }
 
   get phone(): string {
@@ -87,11 +87,6 @@ export class User {
     this.props.updatedAt = new Date();
   }
 
-  updatePassword(hashedPassword: string): void {
-    this.props.passwordHash = hashedPassword;
-    this.props.updatedAt = new Date();
-  }
-
   requirePasswordReset(): void {
     this.props.mustResetPassword = true;
     this.props.updatedAt = new Date();
@@ -99,6 +94,11 @@ export class User {
 
   clearPasswordReset(): void {
     this.props.mustResetPassword = false;
+    this.props.updatedAt = new Date();
+  }
+
+  setCognitoSub(cognitoSub: string): void {
+    this.props.cognitoSub = cognitoSub;
     this.props.updatedAt = new Date();
   }
 
@@ -110,6 +110,7 @@ export class User {
   toResponseObject() {
     return {
       id: this.props.id,
+      cognitoSub: this.props.cognitoSub,
       name: this.props.name,
       email: this.props.email,
       phone: this.props.phone,

@@ -2,8 +2,7 @@ import { Router } from "express";
 
 import { residentController } from "../../container";
 
-import { createJwtMiddleware } from "../../../../shared/middleware/jwtMiddleware";
-import { JwtTokenService } from "../../../auth/infrastructure/services/JwtTokenService";
+import { jwtMiddleware } from "../../../../shared/middleware/jwtMiddleware";
 
 import { rbacMiddleware } from "../../../../shared/middleware/rbacMiddleware";
 import { UserRole } from "../../../auth/domain/entities/User";
@@ -18,7 +17,6 @@ import familyMemberRoutes from "../../../family-members/presentation/routes/fami
 import multer from "multer";
 
 const router = Router();
-const jwtMiddleware = createJwtMiddleware(new JwtTokenService());
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit

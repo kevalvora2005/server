@@ -1,10 +1,7 @@
-import crypto from "crypto";
-import { PasswordResetTokenModel } from "../../../auth/infrastructure/models/PasswordResetTokenModel";
 import { IResidentRepository } from "../../domain/repositories/IResidentRepository";
 import { IUserRepository } from "../../../auth/domain/repositories/IUserRepository";
-import { IPasswordHasher } from "../../../auth/domain/services/IPasswordHasher";
 import { IEmailService } from "../../../auth/domain/services/IEmailService";
-import { UserRole, User } from "../../../auth/domain/entities/User";
+import { UserRole } from "../../../auth/domain/entities/User";
 import { UserModel } from "../../../auth/infrastructure/models/UserModel";
 import { ResidentModel } from "../../infrastructure/models/ResidentModel";
 import { ApartmentModel } from "../../../apartments/infrastructure/models/ApartmentModel";
@@ -13,6 +10,7 @@ import { sequelize } from "../../../../shared/config/db";
 import { buildWelcomeEmailTemplate } from "../templates/welcomeEmailTemplate";
 import { importResidentRowSchema } from "../../presentation/validators/residentValidators";
 import { generateRandomPassword } from "../../../../shared/utils/generateRandomPassword";
+import { CognitoAuthService } from "../../../auth/infrastructure/services/CognitoAuthService";
 
 export interface FailedImportItem {
   row: number;
@@ -41,8 +39,8 @@ export class ImportResidentsUseCase {
   constructor(
     private readonly residentRepository: IResidentRepository,
     private readonly userRepository: IUserRepository,
-    private readonly passwordHasher: IPasswordHasher,
-    private readonly emailService?: IEmailService
+    private readonly emailService: IEmailService,
+    private readonly cognitoAuthService: CognitoAuthService
   ) { }
 
   async execute(fileBuffer: Buffer): Promise<ImportResidentsResult> {
@@ -67,7 +65,6 @@ export class ImportResidentsUseCase {
 
     const failedItems: FailedImportItem[] = [];
 
-    // Helper to extract cell values case-insensitively with header variations
     const getCellValue = (row: Record<string, unknown>, candidateKeys: string[]): unknown => {
       const keys = Object.keys(row);
       for (const candidate of candidateKeys) {
@@ -95,10 +92,9 @@ export class ImportResidentsUseCase {
       isCommitteeMember: boolean;
     }[] = [];
 
-    // 1. Validation & parsing phase using Joi schema
     for (let index = 0; index < rows.length; index++) {
       const row = rows[index];
-      const rowNum = index + 2; // Data starts at Row 2
+      const rowNum = index + 2;
 
       const rawName = getCellValue(row, ["Name", "name", "Full Name"]);
       const rawEmail = getCellValue(row, ["Email", "email", "Email Address"]);
@@ -108,7 +104,6 @@ export class ImportResidentsUseCase {
       const rawUnit = getCellValue(row, ["Unit Number", "Unit", "unitNumber", "Flat Number", "unit"]);
       const rawCommittee = getCellValue(row, ["Is Committee Member", "Committee Member", "isCommitteeMember", "Committee"]);
 
-      // Skip completely blank rows
       if (rawName === undefined && rawEmail === undefined && rawPhone === undefined && rawBlock === undefined && rawFloor === undefined && rawUnit === undefined) {
         continue;
       }
@@ -128,17 +123,20 @@ export class ImportResidentsUseCase {
         }
       }
 
+      let rawPhoneStr = rawPhone !== undefined && rawPhone !== null ? String(rawPhone).trim() : undefined;
+      if (rawPhoneStr?.endsWith(".0")) rawPhoneStr = rawPhoneStr.slice(0, -2);
+      const cleanPhone = rawPhoneStr ? rawPhoneStr.replace(/[^0-9+]/g, "") : undefined;
+
       const candidate = {
         name: rawName !== undefined && rawName !== null ? String(rawName).trim() : undefined,
         email: rawEmail !== undefined && rawEmail !== null ? String(rawEmail).trim().toLowerCase() : undefined,
-        phone: rawPhone !== undefined && rawPhone !== null ? String(rawPhone).trim().replace(/[^0-9+]/g, "") : undefined,
+        phone: cleanPhone,
         block: rawBlock !== undefined && rawBlock !== null ? String(rawBlock).trim().toUpperCase() : undefined,
         floorNumber: rawFloor !== undefined && rawFloor !== null && String(rawFloor).trim() !== "" ? Number(String(rawFloor).trim()) : undefined,
         unitNumber: rawUnitStr,
         isCommitteeMember,
       };
 
-      // Validate row via Joi schema
       const { error, value } = importResidentRowSchema.validate(candidate, { abortEarly: false });
 
       if (error) {
@@ -171,7 +169,6 @@ export class ImportResidentsUseCase {
       };
     }
 
-    // 2. Check for duplicate emails within the uploaded file itself
     const seenEmails = new Map<string, number>();
     const uniqueRows: typeof validRows = [];
     for (const item of validRows) {
@@ -196,7 +193,6 @@ export class ImportResidentsUseCase {
       };
     }
 
-    // 3. Batch query database for existing Users and Apartments
     const emailsToQuery = uniqueRows.map((r) => r.email);
 
     const existingUserModels = await UserModel.findAll({
@@ -208,7 +204,6 @@ export class ImportResidentsUseCase {
       userMapByEmail.set(u.email.toLowerCase(), u);
     }
 
-    // Fetch all apartments to match block, floorNumber, unitNumber
     const allApartments = await ApartmentModel.findAll();
 
     const apartmentMap = new Map<string, ApartmentModel>();
@@ -217,7 +212,6 @@ export class ImportResidentsUseCase {
       apartmentMap.set(key, apt);
     }
 
-    // Fetch all active residents to ensure apartment is not occupied
     const activeResidents = await ResidentModel.findAll({
       where: { isActive: true },
     });
@@ -227,7 +221,6 @@ export class ImportResidentsUseCase {
       occupiedApartmentIds.add(res.apartmentId);
     }
 
-    // 4. Process each row against database business logic
     const createdResidents: CreatedResidentEmailItem[] = [];
     let successCount = 0;
 
@@ -235,7 +228,6 @@ export class ImportResidentsUseCase {
       const aptKey = `${item.block}-${item.floorNumber}-${item.unitNumber}`;
       const apartment = apartmentMap.get(aptKey);
 
-      // Check 1: Apartment exists
       if (!apartment) {
         failedItems.push({
           row: item.rowNum,
@@ -245,7 +237,6 @@ export class ImportResidentsUseCase {
         continue;
       }
 
-      // Check 2: Apartment occupied
       if (occupiedApartmentIds.has(apartment.id)) {
         failedItems.push({
           row: item.rowNum,
@@ -255,7 +246,6 @@ export class ImportResidentsUseCase {
         continue;
       }
 
-      // Check 3: Active user with same email exists
       const existingUser = userMapByEmail.get(item.email);
       if (existingUser && existingUser.isActive) {
         failedItems.push({
@@ -266,31 +256,46 @@ export class ImportResidentsUseCase {
         continue;
       }
 
-      const passwordHash = await this.passwordHasher.hash(item.password);
+      let cognitoSub: string | undefined = existingUser?.cognitoSub || undefined;
+      if (!cognitoSub) {
+        try {
+          cognitoSub = await this.cognitoAuthService.adminCreateUser(
+            item.email,
+            item.name,
+            item.phone,
+            UserRole.RESIDENT,
+            item.password
+          );
+        } catch (error: any) {
+          failedItems.push({
+            row: item.rowNum,
+            identifier: item.email,
+            reason: error.message || "Failed to create resident in identity provider",
+          });
+          continue;
+        }
+      }
 
-      // Database Transaction for per-row consistency
       const transaction = await sequelize.transaction();
 
       try {
         let createdUser: UserModel;
 
         if (existingUser && !existingUser.isActive) {
-          // Reactivate dormant user
-          existingUser.passwordHash = passwordHash;
           existingUser.name = item.name;
           existingUser.phone = item.phone;
           existingUser.isActive = true;
           existingUser.mustResetPassword = true;
+          if (cognitoSub) existingUser.cognitoSub = cognitoSub;
           await existingUser.save({ transaction });
           createdUser = existingUser;
         } else {
-          // Create new user
           createdUser = await UserModel.create(
             {
+              cognitoSub: cognitoSub || null,
               name: item.name,
               email: item.email,
               phone: item.phone,
-              passwordHash,
               role: UserRole.RESIDENT,
               isActive: true,
               mustResetPassword: true,
@@ -299,7 +304,6 @@ export class ImportResidentsUseCase {
           );
         }
 
-        // Create Resident link
         await ResidentModel.create(
           {
             userId: createdUser.id!,
@@ -315,7 +319,6 @@ export class ImportResidentsUseCase {
 
         await transaction.commit();
 
-        // Mark apartment as occupied in local memory set
         occupiedApartmentIds.add(apartment.id);
         successCount++;
 
@@ -340,7 +343,6 @@ export class ImportResidentsUseCase {
       }
     }
 
-    // 6. Send welcome credentials emails directly inside Use Case (Background dispatch)
     if (this.emailService && createdResidents.length > 0) {
       for (const item of createdResidents) {
         (async () => {

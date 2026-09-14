@@ -1,9 +1,7 @@
 import { UserRepository } from "./infrastructure/repositories/UserRepository";
-import { RefreshTokenRepository } from "./infrastructure/repositories/RefreshTokenRepository";
 import { PasswordResetTokenRepository } from "./infrastructure/repositories/PasswordResetTokenRepository";
-import { BcryptPasswordHasher } from "./infrastructure/services/BcryptPasswordHasher";
-import { JwtTokenService } from "./infrastructure/services/JwtTokenService";
 import { NodemailerEmailService } from "./infrastructure/services/NodemailerEmailService";
+import { CognitoAuthService } from "./infrastructure/services/CognitoAuthService";
 import { CreateUserUseCase } from "./application/use-cases/CreateUserUseCase";
 import { LoginUseCase } from "./application/use-cases/LoginUseCase";
 import { RefreshTokenUseCase } from "./application/use-cases/RefreshTokenUseCase";
@@ -16,27 +14,27 @@ import { UpdateProfileUseCase } from "./application/use-cases/UpdateProfileUseCa
 import { ChangePasswordUseCase } from "./application/use-cases/ChangePasswordUseCase";
 import { ResidentRepository } from "../residents/infrastructure/repositories/ResidentRepository";
 
-// 1. Core Infrastructure Adapters
 const userRepository = new UserRepository();
 const residentRepository = new ResidentRepository();
-const refreshTokenRepository = new RefreshTokenRepository();
 const passwordResetTokenRepository = new PasswordResetTokenRepository();
-const passwordHasher = new BcryptPasswordHasher();
-const tokenService = new JwtTokenService();
 const emailService = new NodemailerEmailService();
+const cognitoAuthService = new CognitoAuthService();
 
-// 2. Intermediary Business Use Case Layer
-const createUserUseCase = new CreateUserUseCase(userRepository, passwordHasher);
-const loginUseCase = new LoginUseCase(userRepository, refreshTokenRepository, passwordHasher, tokenService);
-const refreshTokenUseCase = new RefreshTokenUseCase(userRepository, refreshTokenRepository, tokenService);
-const logoutUseCase = new LogoutUseCase(refreshTokenRepository);
+const createUserUseCase = new CreateUserUseCase(userRepository, cognitoAuthService);
+const loginUseCase = new LoginUseCase(userRepository, cognitoAuthService);
+const refreshTokenUseCase = new RefreshTokenUseCase(userRepository, cognitoAuthService);
+const logoutUseCase = new LogoutUseCase(cognitoAuthService);
 const getCurrentUserUseCase = new GetCurrentUserUseCase(userRepository, residentRepository);
 const forgotPasswordUseCase = new ForgotPasswordUseCase(userRepository, passwordResetTokenRepository, emailService);
-const resetPasswordUseCase = new ResetPasswordUseCase(userRepository, passwordResetTokenRepository, passwordHasher, refreshTokenRepository, tokenService, residentRepository);
+const resetPasswordUseCase = new ResetPasswordUseCase(
+  userRepository,
+  passwordResetTokenRepository,
+  cognitoAuthService,
+  residentRepository
+);
 const updateProfileUseCase = new UpdateProfileUseCase(userRepository);
-const changePasswordUseCase = new ChangePasswordUseCase(userRepository, passwordHasher);
+const changePasswordUseCase = new ChangePasswordUseCase(userRepository, cognitoAuthService);
 
-// 3. Presentation Layer Controller Delivery Singleton
 export const authController = new AuthController(
   createUserUseCase,
   loginUseCase,

@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../../modules/auth/domain/errors/AuthErrors";
 import { ApiResponse } from "../utils/apiResponse";
-import { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 
 export const errorHandler = (
   error: Error,
@@ -12,12 +11,12 @@ export const errorHandler = (
 
   console.error(`[Error Handler Triggered]:`, error);
 
-  if (error instanceof TokenExpiredError) {
+  if (error.name === "TokenExpiredError") {
     res.status(401).json(ApiResponse.error("Session expired. Please log in again."));
     return;
   }
 
-  if (error instanceof JsonWebTokenError) {
+  if (error.name === "JsonWebTokenError") {
     res.status(401).json(ApiResponse.error("Invalid token."));
     return;
   }

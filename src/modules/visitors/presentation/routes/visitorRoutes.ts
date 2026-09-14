@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { visitorController } from "../../container";
-import { createJwtMiddleware } from "../../../../shared/middleware/jwtMiddleware";
-import { JwtTokenService } from "../../../auth/infrastructure/services/JwtTokenService";
+import { jwtMiddleware } from "../../../../shared/middleware/jwtMiddleware";
 import { rbacMiddleware } from "../../../../shared/middleware/rbacMiddleware";
 import { UserRole } from "../../../auth/domain/entities/User";
 import { uploadMiddleware } from "../../../../shared/middleware/uploadMiddleware";
@@ -12,7 +11,6 @@ import {
 } from "../validators/visitorValidators";
 
 const router = Router();
-const jwtMiddleware = createJwtMiddleware(new JwtTokenService());
 
 /*
  |--------------------------------------------------------------------------

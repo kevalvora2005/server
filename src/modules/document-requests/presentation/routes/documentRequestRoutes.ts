@@ -1,8 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import { documentRequestController } from "../../container";
-import { createJwtMiddleware } from "../../../../shared/middleware/jwtMiddleware";
-import { JwtTokenService } from "../../../auth/infrastructure/services/JwtTokenService";
+import { jwtMiddleware } from "../../../../shared/middleware/jwtMiddleware";
 import { rbacMiddleware } from "../../../../shared/middleware/rbacMiddleware";
 import { UserRole } from "../../../auth/domain/entities/User";
 import {
@@ -12,7 +11,6 @@ import {
 } from "../validators/documentRequestValidators";
 
 const router = Router();
-const jwtMiddleware = createJwtMiddleware(new JwtTokenService());
 
 const upload = multer({
   storage: multer.memoryStorage(),
