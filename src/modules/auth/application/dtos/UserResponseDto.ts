@@ -16,7 +16,6 @@ export interface UserResponseDto {
   role: UserRole;
   isActive: boolean;
   mustResetPassword?: boolean;
-  resetToken?: string;
   createdAt: Date;
   residentId?: number | null;
   resident?: ResidentSummaryDto | null;

@@ -4,7 +4,6 @@ export { sequelize };
 
 import "../../modules/auth/infrastructure/models/UserModel";
 import "../../modules/residents/infrastructure/models/ResidentModel";
-import "../../modules/auth/infrastructure/models/PasswordResetTokenModel";
 import "../../modules/apartments/infrastructure/models/ApartmentModel";
 import "../../modules/family-members/infrastructure/models/FamilyMemberModel";
 import "../../modules/vehicles/infrastructure/models/VehicleModel";

@@ -1,6 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
-import { PasswordResetTokenModel } from "../../../auth/infrastructure/models/PasswordResetTokenModel";
 import { IEmailService } from "../../../auth/domain/services/IEmailService";
 
 import { CreateResidentUseCase } from "../../application/use-cases/CreateResidentUseCase";

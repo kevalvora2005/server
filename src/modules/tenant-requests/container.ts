@@ -1,7 +1,6 @@
 import { TenantRequestRepository } from "./infrastructure/repositories/TenantRequestRepository";
 import { TenantRequestVoteRepository } from "./infrastructure/repositories/TenantRequestVoteRepository";
 import { UserRepository } from "../auth/infrastructure/repositories/UserRepository";
-import { PasswordResetTokenRepository } from "../auth/infrastructure/repositories/PasswordResetTokenRepository";
 import { NodemailerEmailService } from "../auth/infrastructure/services/NodemailerEmailService";
 import { CognitoAuthService } from "../auth/infrastructure/services/CognitoAuthService";
 
@@ -19,7 +18,6 @@ const tenantRequestVoteRepository = new TenantRequestVoteRepository();
 const residentRepository = new ResidentRepository();
 const userRepository = new UserRepository();
 const visitorRepository = new VisitorRepository();
-const passwordResetTokenRepository = new PasswordResetTokenRepository();
 const emailService = new NodemailerEmailService();
 const cognitoAuthService = new CognitoAuthService();
 
@@ -30,7 +28,6 @@ const finalizeTenantRequestUseCase = new FinalizeTenantRequestUseCase(
   tenantRequestVoteRepository,
   residentRepository,
   userRepository,
-  passwordResetTokenRepository,
   emailService,
   cognitoAuthService
 );

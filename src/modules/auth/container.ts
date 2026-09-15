@@ -1,5 +1,4 @@
 import { UserRepository } from "./infrastructure/repositories/UserRepository";
-import { PasswordResetTokenRepository } from "./infrastructure/repositories/PasswordResetTokenRepository";
 import { NodemailerEmailService } from "./infrastructure/services/NodemailerEmailService";
 import { CognitoAuthService } from "./infrastructure/services/CognitoAuthService";
 import { CreateUserUseCase } from "./application/use-cases/CreateUserUseCase";
@@ -16,7 +15,6 @@ import { ResidentRepository } from "../residents/infrastructure/repositories/Res
 
 const userRepository = new UserRepository();
 const residentRepository = new ResidentRepository();
-const passwordResetTokenRepository = new PasswordResetTokenRepository();
 const emailService = new NodemailerEmailService();
 const cognitoAuthService = new CognitoAuthService();
 
@@ -29,7 +27,6 @@ const forgotPasswordUseCase = new ForgotPasswordUseCase(userRepository, cognitoA
 const resetPasswordUseCase = new ResetPasswordUseCase(
   userRepository,
   cognitoAuthService,
-  passwordResetTokenRepository,
   residentRepository
 );
 const updateProfileUseCase = new UpdateProfileUseCase(userRepository);

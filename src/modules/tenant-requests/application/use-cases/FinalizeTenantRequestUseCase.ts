@@ -2,7 +2,6 @@ import { TenantRequest } from "../../domain/entities/TenantRequest";
 import { ITenantRequestRepository } from "../../domain/repositories/ITenantRequestRepository";
 import { ITenantRequestVoteRepository } from "../../domain/repositories/ITenantRequestVoteRepository";
 import { IUserRepository } from "../../../auth/domain/repositories/IUserRepository";
-import { IPasswordResetTokenRepository } from "../../../auth/domain/repositories/IPasswordResetTokenRepository";
 import { IEmailService } from "../../../auth/domain/services/IEmailService";
 import { User, UserRole } from "../../../auth/domain/entities/User";
 import { FinalizeTenantRequestDto } from "../dtos/FinalizeTenantRequestDto";
@@ -33,7 +32,6 @@ export class FinalizeTenantRequestUseCase {
     private readonly tenantRequestVoteRepository: ITenantRequestVoteRepository,
     private readonly residentRepository: IResidentRepository,
     private readonly userRepository: IUserRepository,
-    private readonly passwordResetTokenRepository: IPasswordResetTokenRepository,
     private readonly emailService: IEmailService,
     private readonly cognitoAuthService: CognitoAuthService
   ) { }

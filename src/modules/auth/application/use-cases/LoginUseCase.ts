@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import { LoginDto } from "../dtos/LoginDto";
 import { AuthResponseDto } from "../dtos/AuthResponseDto";
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
@@ -8,7 +7,6 @@ import {
   InactiveUserError,
 } from "../../domain/errors/AuthErrors";
 import { CognitoAuthService } from "../../infrastructure/services/CognitoAuthService";
-import { PasswordResetTokenModel } from "../../infrastructure/models/PasswordResetTokenModel";
 import { IResidentRepository } from "../../../residents/domain/repositories/IResidentRepository";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,22 +45,10 @@ export class LoginUseCase {
       throw new InvalidCredentialsError();
     }
 
-    let resetToken: string | undefined = undefined;
     if (user.mustResetPassword && user.id) {
-      const rawToken = crypto.randomBytes(32).toString("hex");
-      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-      await PasswordResetTokenModel.destroy({
-        where: { userId: user.id },
-      });
-
-      await PasswordResetTokenModel.create({
-        userId: user.id,
-        token: rawToken,
-        expiresAt,
-      });
-
-      resetToken = rawToken;
+      try {
+        await this.cognitoAuthService.forgotPassword(user.email);
+      } catch (err) {}
     }
 
     let resident = null;
@@ -75,7 +61,6 @@ export class LoginUseCase {
       refreshToken: tokens.refreshToken,
       user: {
         ...user.toResponseObject(),
-        resetToken,
         residentId: resident?.id ?? null,
         resident: resident
           ? {
