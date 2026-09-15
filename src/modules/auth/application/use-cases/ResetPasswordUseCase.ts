@@ -23,8 +23,7 @@ export class ResetPasswordUseCase {
   ) { }
 
   async execute(dto: ResetPasswordDto): Promise<ResetPasswordResult> {
-    const code = dto.code || dto.confirmationCode || dto.token;
-    if (!code) {
+    if (!dto.code && !dto.token) {
       throw new AppError("Verification code or reset token is required", 400);
     }
 
@@ -54,12 +53,16 @@ export class ResetPasswordUseCase {
         throw new AppError("Email is required for password reset", 400);
       }
 
+      if (!dto.code) {
+        throw new AppError("Verification code is required", 400);
+      }
+
       user = await this.userRepository.findByEmail(email);
       if (!user || !user.isActive) {
         throw new UserNotFoundError();
       }
 
-      await this.cognitoAuthService.confirmForgotPassword(email, code, dto.newPassword);
+      await this.cognitoAuthService.confirmForgotPassword(email, dto.code, dto.newPassword);
     }
 
     if (user.mustResetPassword) {
