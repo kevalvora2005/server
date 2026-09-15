@@ -7,10 +7,13 @@ import {
   UserNotFoundError,
 } from "../../domain/errors/AuthErrors";
 
+import { IResidentRepository } from "../../../residents/domain/repositories/IResidentRepository";
+
 export class RefreshTokenUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
     private readonly cognitoAuthService: CognitoAuthService,
+    private readonly residentRepository?: IResidentRepository,
     private readonly tokenVerifier: CognitoTokenVerifier = new CognitoTokenVerifier()
   ) { }
 
@@ -38,10 +41,27 @@ export class RefreshTokenUseCase {
         throw new InvalidRefreshTokenError();
       }
 
+      let resident = null;
+      if (this.residentRepository && user.id) {
+        resident = await this.residentRepository.findByUserId(user.id);
+      }
+
       return {
         accessToken: freshTokens.accessToken,
         refreshToken: refreshToken,
-        user: user.toResponseObject(),
+        user: {
+          ...user.toResponseObject(),
+          residentId: resident?.id ?? null,
+          resident: resident
+            ? {
+              id: resident.id!,
+              isOwner: resident.isOwner,
+              isOccupant: resident.isOccupant,
+              moveInDate: resident.moveInDate,
+              apartmentId: resident.apartmentId,
+            }
+            : null,
+        },
       };
     } catch (error) {
       throw new InvalidRefreshTokenError();

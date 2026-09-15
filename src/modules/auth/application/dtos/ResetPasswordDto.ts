@@ -1,4 +1,7 @@
 export interface ResetPasswordDto {
-  token: string;
+  email?: string;
+  code?: string;
+  confirmationCode?: string;
+  token?: string;
   newPassword: string;
-}
+}

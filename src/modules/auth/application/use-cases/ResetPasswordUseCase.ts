@@ -1,10 +1,12 @@
 import { IUserRepository } from "../../domain/repositories/IUserRepository";
 import { IPasswordResetTokenRepository } from "../../domain/repositories/IPasswordResetTokenRepository";
 import { ResetPasswordDto } from "../dtos/ResetPasswordDto";
-import { ExpiredResetTokenError, InvalidResetTokenError, UserNotFoundError } from "../../domain/errors/AuthErrors";
+import { ExpiredResetTokenError, UserNotFoundError } from "../../domain/errors/AuthErrors";
 import { UserResponseDto } from "../dtos/UserResponseDto";
 import { IResidentRepository } from "../../../residents/domain/repositories/IResidentRepository";
 import { CognitoAuthService } from "../../infrastructure/services/CognitoAuthService";
+import { AppError } from "../../../../shared/errors/AppError";
+import { User } from "../../domain/entities/User";
 
 export interface ResetPasswordResult {
   accessToken: string;
@@ -15,47 +17,69 @@ export interface ResetPasswordResult {
 export class ResetPasswordUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
-    private readonly passwordResetTokenRepository: IPasswordResetTokenRepository,
     private readonly cognitoAuthService: CognitoAuthService,
+    private readonly passwordResetTokenRepository?: IPasswordResetTokenRepository,
     private readonly residentRepository?: IResidentRepository
   ) { }
 
   async execute(dto: ResetPasswordDto): Promise<ResetPasswordResult> {
-    const tokenEntity = await this.passwordResetTokenRepository.findByToken(dto.token);
-
-    if (!tokenEntity) {
-      throw new InvalidResetTokenError();
+    const code = dto.code || dto.confirmationCode || dto.token;
+    if (!code) {
+      throw new AppError("Verification code or reset token is required", 400);
     }
 
-    if (tokenEntity.isExpired()) {
-      await this.passwordResetTokenRepository.deleteByToken(dto.token);
-      throw new ExpiredResetTokenError();
+    let user: User | null = null;
+
+    if (this.passwordResetTokenRepository && dto.token) {
+      const tokenEntity = await this.passwordResetTokenRepository.findByToken(dto.token);
+      if (tokenEntity) {
+        if (tokenEntity.isExpired()) {
+          await this.passwordResetTokenRepository.deleteByToken(dto.token);
+          throw new ExpiredResetTokenError();
+        }
+
+        user = await this.userRepository.findById(tokenEntity.userId);
+        if (!user || !user.isActive) {
+          throw new UserNotFoundError();
+        }
+
+        await this.cognitoAuthService.adminSetUserPassword(user.email, dto.newPassword);
+        await this.passwordResetTokenRepository.deleteByToken(dto.token);
+      }
     }
 
-    const user = await this.userRepository.findById(tokenEntity.userId);
-    if (!user || !user.isActive) {
-      throw new UserNotFoundError();
+    if (!user) {
+      const email = dto.email;
+      if (!email) {
+        throw new AppError("Email is required for password reset", 400);
+      }
+
+      user = await this.userRepository.findByEmail(email);
+      if (!user || !user.isActive) {
+        throw new UserNotFoundError();
+      }
+
+      await this.cognitoAuthService.confirmForgotPassword(email, code, dto.newPassword);
     }
 
-    await this.cognitoAuthService.adminSetUserPassword(user.email, dto.newPassword);
-
-    user.clearPasswordReset();
-    const updatedUser = await this.userRepository.update(user);
-
-    await this.passwordResetTokenRepository.deleteByToken(dto.token);
+    if (user.mustResetPassword) {
+      user.clearPasswordReset();
+      user = await this.userRepository.update(user);
+    }
 
     const tokens = await this.cognitoAuthService.login(user.email, dto.newPassword);
 
     let resident = null;
-    if (this.residentRepository && updatedUser.id) {
-      resident = await this.residentRepository.findByUserId(updatedUser.id);
+    if (this.residentRepository && user.id) {
+      resident = await this.residentRepository.findByUserId(user.id);
     }
 
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
       user: {
-        ...updatedUser.toResponseObject(),
+        ...user.toResponseObject(),
+        residentId: resident?.id ?? null,
         resident: resident
           ? {
             id: resident.id!,
@@ -68,4 +92,4 @@ export class ResetPasswordUseCase {
       },
     };
   }
-}
+}

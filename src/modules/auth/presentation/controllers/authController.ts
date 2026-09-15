@@ -122,7 +122,7 @@ export class AuthController {
 
       res.status(200).json(
         ApiResponse.success({
-          message: "If an account exists with this email, a reset link has been sent.",
+          message: "If an account exists with this email, a verification code has been sent.",
           data: null,
         })
       );

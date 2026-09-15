@@ -55,9 +55,13 @@ const forgotPasswordSchema = Joi.object({
 });
 
 const resetPasswordSchema = Joi.object({
-  token: Joi.string().required().messages({
-    'string.empty': 'Reset token is required',
+  email: Joi.string().trim().email().optional().messages({
+    'string.email': 'Please provide a valid email',
   }),
+
+  code: Joi.string().trim().optional(),
+  confirmationCode: Joi.string().trim().optional(),
+  token: Joi.string().trim().optional(),
 
   newPassword: Joi.string()
     .min(8)
@@ -70,6 +74,8 @@ const resetPasswordSchema = Joi.object({
       'string.min': 'Password must be at least 8 characters',
       'string.pattern.base': 'Password must contain at least one uppercase letter, one number, and one special character',
     }),
+}).or('code', 'confirmationCode', 'token').messages({
+  'object.missing': 'Verification code or reset token is required',
 });
 
 const updateProfileSchema = Joi.object({

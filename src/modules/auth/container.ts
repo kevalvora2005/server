@@ -21,15 +21,15 @@ const emailService = new NodemailerEmailService();
 const cognitoAuthService = new CognitoAuthService();
 
 const createUserUseCase = new CreateUserUseCase(userRepository, cognitoAuthService);
-const loginUseCase = new LoginUseCase(userRepository, cognitoAuthService);
-const refreshTokenUseCase = new RefreshTokenUseCase(userRepository, cognitoAuthService);
+const loginUseCase = new LoginUseCase(userRepository, cognitoAuthService, residentRepository);
+const refreshTokenUseCase = new RefreshTokenUseCase(userRepository, cognitoAuthService, residentRepository);
 const logoutUseCase = new LogoutUseCase(cognitoAuthService);
 const getCurrentUserUseCase = new GetCurrentUserUseCase(userRepository, residentRepository);
-const forgotPasswordUseCase = new ForgotPasswordUseCase(userRepository, passwordResetTokenRepository, emailService);
+const forgotPasswordUseCase = new ForgotPasswordUseCase(userRepository, cognitoAuthService);
 const resetPasswordUseCase = new ResetPasswordUseCase(
   userRepository,
-  passwordResetTokenRepository,
   cognitoAuthService,
+  passwordResetTokenRepository,
   residentRepository
 );
 const updateProfileUseCase = new UpdateProfileUseCase(userRepository);

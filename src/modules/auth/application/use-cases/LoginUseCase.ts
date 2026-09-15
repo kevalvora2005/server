@@ -9,14 +9,17 @@ import {
 } from "../../domain/errors/AuthErrors";
 import { CognitoAuthService } from "../../infrastructure/services/CognitoAuthService";
 import { PasswordResetTokenModel } from "../../infrastructure/models/PasswordResetTokenModel";
+import { IResidentRepository } from "../../../residents/domain/repositories/IResidentRepository";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export class LoginUseCase {
   constructor(
     private readonly userRepository: IUserRepository,
-    private readonly cognitoAuthService: CognitoAuthService
+    private readonly cognitoAuthService: CognitoAuthService,
+    private readonly residentRepository?: IResidentRepository
   ) { }
+
 
   async execute(dto: LoginDto): Promise<AuthResponseDto> {
     const isEmail = EMAIL_PATTERN.test(dto.identifier);
@@ -62,13 +65,28 @@ export class LoginUseCase {
       resetToken = rawToken;
     }
 
+    let resident = null;
+    if (this.residentRepository && user.id) {
+      resident = await this.residentRepository.findByUserId(user.id);
+    }
+
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
       user: {
         ...user.toResponseObject(),
         resetToken,
+        residentId: resident?.id ?? null,
+        resident: resident
+          ? {
+            id: resident.id!,
+            isOwner: resident.isOwner,
+            isOccupant: resident.isOccupant,
+            moveInDate: resident.moveInDate,
+            apartmentId: resident.apartmentId,
+          }
+          : null,
       },
     };
   }
-}
+}

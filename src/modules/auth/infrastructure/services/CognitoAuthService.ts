@@ -8,6 +8,8 @@ import {
   AdminGetUserCommand,
   GlobalSignOutCommand,
   RevokeTokenCommand,
+  ForgotPasswordCommand,
+  ConfirmForgotPasswordCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { env } from "../../../../shared/config/env";
 import { AppError } from "../../../../shared/errors/AppError";
@@ -218,4 +220,35 @@ export class CognitoAuthService {
     } catch {
     }
   }
+
+  async forgotPassword(email: string): Promise<void> {
+    try {
+      const command = new ForgotPasswordCommand({
+        ClientId: this.clientId,
+        Username: email,
+      });
+      await this.client.send(command);
+    } catch (error: any) {
+      throw new AppError(error.message || "Failed to initiate password reset", 400);
+    }
+  }
+
+  async confirmForgotPassword(
+    email: string,
+    confirmationCode: string,
+    newPassword: string
+  ): Promise<void> {
+    try {
+      const command = new ConfirmForgotPasswordCommand({
+        ClientId: this.clientId,
+        Username: email,
+        ConfirmationCode: confirmationCode,
+        Password: newPassword,
+      });
+      await this.client.send(command);
+    } catch (error: any) {
+      throw new AppError(error.message || "Failed to reset password", 400);
+    }
+  }
 }
+
