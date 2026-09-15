@@ -96,7 +96,7 @@ export class CognitoAuthService {
         expiresIn: result.ExpiresIn,
       };
     } catch (error: any) {
-      throw error instanceof AppError ? error : new AppError(error.message || "Invalid credentials", 401);
+      throw new AppError(error.message || "Invalid credentials", 401);
     }
   }
 
@@ -124,27 +124,8 @@ export class CognitoAuthService {
         expiresIn: result.ExpiresIn,
       };
     } catch (error: any) {
-      if (error instanceof AppError) throw error;
-      throw new AppError("Session refresh failed or token expired", 401);
+      throw new AppError(error.message || "Session refresh failed or token expired", 401);
     }
-  }
-
-  formatToE164(phone: string): string {
-    if (!phone) return phone;
-    let cleaned = phone.trim().replace(/[\s\-()]/g, "");
-    if (cleaned.startsWith("+")) {
-      return cleaned;
-    }
-    if (cleaned.startsWith("0")) {
-      cleaned = cleaned.substring(1);
-    }
-    if (cleaned.length === 10) {
-      return `+91${cleaned}`;
-    }
-    if (cleaned.length === 12 && cleaned.startsWith("91")) {
-      return `+${cleaned}`;
-    }
-    return `+${cleaned}`;
   }
 
   async adminCreateUser(
@@ -155,8 +136,6 @@ export class CognitoAuthService {
     password: string
   ): Promise<string> {
     try {
-      const formattedPhone = this.formatToE164(phone);
-
       const createCommand = new AdminCreateUserCommand({
         UserPoolId: this.userPoolId,
         Username: email,
@@ -164,7 +143,6 @@ export class CognitoAuthService {
         UserAttributes: [
           { Name: "email", Value: email },
           { Name: "name", Value: name },
-          { Name: "phone_number", Value: formattedPhone },
           { Name: "email_verified", Value: "true" },
         ],
         MessageAction: "SUPPRESS",
@@ -190,13 +168,10 @@ export class CognitoAuthService {
 
       return cognitoSub;
     } catch (error: any) {
-      if (error.name === "UsernameExistsException" || error.message?.includes("already exists")) {
-        const existingSub = await this.adminGetUser(email);
-        if (existingSub) {
-          return existingSub;
-        }
+      if (error.name === "UsernameExistsException") {
+        throw new AppError("User already exists with this email", 409);
       }
-      throw error instanceof AppError ? error : new AppError(error.message || "Failed to create user in identity provider", 400);
+      throw new AppError(error.message || "Failed to create user in identity provider", 400);
     }
   }
 

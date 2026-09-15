@@ -42,8 +42,7 @@ export class CognitoTokenVerifier {
           groups: (payload["cognito:groups"] as string[]) || [],
           tokenUse: "access",
         };
-      } catch (err: any) {
-        console.debug("[CognitoAuthService] access token verification failed:", err.message);
+      } catch {
       }
     }
 
@@ -58,8 +57,7 @@ export class CognitoTokenVerifier {
           groups: (payload["cognito:groups"] as string[]) || [],
           tokenUse: "id",
         };
-      } catch (err: any) {
-        console.debug("[CognitoAuthService] id token verification failed:", err.message);
+      } catch {
       }
     }
 
