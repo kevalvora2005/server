@@ -1,4 +1,4 @@
-import i18n from "../../../../shared/config/i18n";
+import { t } from "../../../../shared/config/i18n";
 import { Booking } from "../../domain/entities/Booking";
 import { Amenity } from "../../domain/entities/Amenity";
 import { env } from "../../../../shared/config/env";
@@ -11,8 +11,7 @@ export interface BuildBookingPdfTemplateOptions {
 export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions): string {
   const { booking, amenity } = options;
 
-  const lng = booking.resident?.preferredLanguage || "en";
-  const loc = booking.resident?.locale || (lng === "hi" ? "hi-IN" : lng === "gu" ? "gu-IN" : "en-IN");
+  const loc = booking.resident?.locale || "en-IN";
 
   const paidDate = booking.paidAt
     ? new Date(booking.paidAt).toLocaleDateString(loc, {
@@ -41,8 +40,8 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
 
   const isUpi = booking.paymentRef?.toUpperCase().startsWith("UPI");
   const paymentMethod = isUpi
-    ? i18n.t("invoice.payment_methods.upi", { lng })
-    : i18n.t("invoice.payment_methods.cash", { lng });
+    ? t("invoice.payment_methods.upi")
+    : t("invoice.payment_methods.cash");
 
   const paymentReference = booking.paymentRef
     ? booking.paymentRef.replace(/^UPI\s*[-:]?\s*/i, "UTR: ")
@@ -65,7 +64,7 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
 
   const isShared = amenity?.bookingType === "SHARED_CAPACITY" || amenity?.isSharedCapacity;
   const attendeesText = isShared
-    ? ` &bull; ${i18n.t("booking.attendees", { lng })}: ${booking.memberCount || 1} ${i18n.t("booking.persons", { lng })}`
+    ? ` &bull; ${t("booking.attendees")}: ${booking.memberCount || 1} ${t("booking.persons")}`
     : "";
 
   const verificationPayload = JSON.stringify({
@@ -153,10 +152,10 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
           <div class="top-bar">
             <div class="left">
               <h1>${societyName}</h1>
-              <p>${i18n.t("booking.receipt_title", { lng })}</p>
+              <p>${t("booking.receipt_title")}</p>
             </div>
             <div class="right">
-              <div class="badge-paid">${i18n.t("booking.status_paid", { lng })}</div>
+              <div class="badge-paid">${t("booking.status_paid")}</div>
             </div>
           </div>
 
@@ -168,15 +167,15 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
             <!-- Meta -->
             <div class="meta-grid">
               <div class="meta-col">
-                <div class="meta-label">${i18n.t("booking.receipt_no", { lng })}</div>
+                <div class="meta-label">${t("booking.receipt_no")}</div>
                 <div class="meta-value">#BKG-${String(booking.id).padStart(4, "0")}</div>
               </div>
               <div class="meta-col">
-                <div class="meta-label">${i18n.t("booking.date_paid", { lng })}</div>
+                <div class="meta-label">${t("booking.date_paid")}</div>
                 <div class="meta-value">${paidDate}</div>
               </div>
               <div class="meta-col">
-                <div class="meta-label">${i18n.t("booking.reserved_slot", { lng })}</div>
+                <div class="meta-label">${t("booking.reserved_slot")}</div>
                 <div class="meta-value">${formattedBookingDate}</div>
                 <div class="meta-sub">${booking.startTime} – ${booking.endTime}</div>
               </div>
@@ -185,25 +184,25 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
             <div class="meta-divider"></div>
 
             <!-- Reserved by -->
-            <div class="section-title">${i18n.t("booking.reserved_by", { lng })}</div>
+            <div class="section-title">${t("booking.reserved_by")}</div>
             <div class="meta-grid" style="margin-bottom: 18px;">
               <div class="meta-col">
                 <div class="meta-value">${residentName}</div>
                 <div class="meta-sub">${residentEmail || residentPhone}</div>
               </div>
               <div class="meta-col">
-                <div class="meta-value">${i18n.t("booking.apartment", { lng })} ${aptLabel}</div>
-                <div class="meta-sub">${i18n.t("booking.purpose", { lng })}: ${booking.purpose || i18n.t("booking.general_reservation", { lng })}</div>
+                <div class="meta-value">${t("booking.apartment")} ${aptLabel}</div>
+                <div class="meta-sub">${t("booking.purpose")}: ${booking.purpose || t("booking.general_reservation")}</div>
               </div>
             </div>
 
             <!-- Charges -->
-            <div class="section-title">${i18n.t("booking.charge_details", { lng })}</div>
+            <div class="section-title">${t("booking.charge_details")}</div>
             <table class="invoice-table">
               <thead>
                 <tr>
-                  <th style="width:75%">${i18n.t("booking.facility", { lng })}</th>
-                  <th style="width:25%" class="amt">${i18n.t("booking.fee_amount", { lng })}</th>
+                  <th style="width:75%">${t("booking.facility")}</th>
+                  <th style="width:25%" class="amt">${t("booking.fee_amount")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -211,13 +210,13 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
                   <td>
                     <strong>${amenityName}</strong>
                     <div style="font-size:11px; color:#64748b; margin-top:2px;">
-                      ${i18n.t("booking.time_slot", { lng })}: ${booking.startTime} – ${booking.endTime} (${formattedBookingDate})${attendeesText}
+                      ${t("booking.time_slot")}: ${booking.startTime} – ${booking.endTime} (${formattedBookingDate})${attendeesText}
                     </div>
                   </td>
                   <td class="amt">${formattedPrice}</td>
                 </tr>
                 <tr class="total-row">
-                  <td>${i18n.t("booking.total_paid", { lng })}</td>
+                  <td>${t("booking.total_paid")}</td>
                   <td class="amt">${formattedPrice}</td>
                 </tr>
               </tbody>
@@ -229,26 +228,26 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
                 <!-- Payment -->
                 <div class="payment-box">
                   <div class="row">
-                    <span class="label">${i18n.t("booking.payment_reference", { lng })}</span>
+                    <span class="label">${t("booking.payment_reference")}</span>
                     <span class="value">${paymentReference}</span>
                   </div>
                   <div class="row" style="margin-top:4px;">
-                    <span class="label">${i18n.t("booking.payment_method", { lng })}</span>
+                    <span class="label">${t("booking.payment_method")}</span>
                     <span class="value">${paymentMethod}</span>
                   </div>
                 </div>
 
                 <!-- Rules -->
                 <div class="rules-box">
-                  <div class="rules-title">${i18n.t("booking.rules", { lng })}</div>
-                  <div class="rules-text">${i18n.t("booking.rules_text", { lng })}</div>
+                  <div class="rules-title">${t("booking.rules")}</div>
+                  <div class="rules-text">${t("booking.rules_text")}</div>
                 </div>
               </div>
 
               <!-- Verification QR -->
               <div class="details-col-right">
                 <img class="qr-image" src="${qrCodeUrl}" alt="Verification QR" />
-                <div class="qr-label">${i18n.t("booking.qr_notice", { lng })}</div>
+                <div class="qr-label">${t("booking.qr_notice")}</div>
               </div>
             </div>
 
@@ -256,7 +255,7 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
 
           <!-- ─── FOOTER ─── -->
           <div class="footer">
-            <strong>${societyName}</strong> &mdash; ${i18n.t("booking.footer_notice", { lng })}
+            <strong>${societyName}</strong> &mdash; ${t("booking.footer_notice")}
           </div>
 
         </div>

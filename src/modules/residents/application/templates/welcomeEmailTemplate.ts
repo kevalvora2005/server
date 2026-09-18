@@ -1,4 +1,4 @@
-import i18n from "../../../../shared/config/i18n";
+import { t } from "../../../../shared/config/i18n";
 
 export interface WelcomeEmailTemplateOptions {
   name: string;
@@ -17,63 +17,26 @@ export function buildWelcomeEmailTemplate(options: WelcomeEmailTemplateOptions):
 } {
   const societyName = options.societyName || process.env.SOCIETY_NAME || "Civic Horizon";
   const clientUrl = options.clientUrl || process.env.CLIENT_URL || "http://localhost:5173";
-  const lng = options.preferredLanguage || "en";
 
-  const subject = i18n.t("email.welcome_subject", {
-    lng,
-    societyName,
-    defaultValue: `Welcome to ${societyName} - Your Account Credentials`,
-  });
+  const subject = t("email.welcome_subject", { societyName });
 
-  const header = i18n.t("email.welcome_header", {
-    lng,
-    societyName,
-    defaultValue: `Welcome to ${societyName}!`,
-  });
+  const header = t("email.welcome_header", { societyName });
 
-  const greeting = i18n.t("email.welcome_greeting", {
-    lng,
-    name: options.name,
-    defaultValue: `Hello ${options.name},`,
-  });
+  const greeting = t("email.welcome_greeting", { name: options.name });
 
-  const body = i18n.t("email.welcome_body", {
-    lng,
-    unitName: options.unitName,
-    societyName,
-    defaultValue: `An account has been created for you as a resident of unit ${options.unitName} at ${societyName}.`,
-  });
+  const body = t("email.welcome_body", { unitName: options.unitName, societyName });
 
-  const credentialsTitle = i18n.t("email.welcome_credentials_title", {
-    lng,
-    defaultValue: "Your Login Credentials:",
-  });
+  const credentialsTitle = t("email.welcome_credentials_title");
 
-  const emailLabel = i18n.t("email.welcome_email_label", {
-    lng,
-    defaultValue: "Email:",
-  });
+  const emailLabel = t("email.welcome_email_label");
 
-  const tempPassLabel = i18n.t("email.welcome_temp_pass", {
-    lng,
-    defaultValue: "Temporary Password:",
-  });
+  const tempPassLabel = t("email.welcome_temp_pass");
 
-  const firstLoginNote = i18n.t("email.welcome_first_login_note", {
-    lng,
-    defaultValue:
-      "Please log in to your account using your temporary password. You will be prompted to reset your password upon your first login.",
-  });
+  const firstLoginNote = t("email.welcome_first_login_note");
 
-  const loginCta = i18n.t("email.welcome_login_cta", {
-    lng,
-    defaultValue: "Log In to Your Account",
-  });
+  const loginCta = t("email.welcome_login_cta");
 
-  const footer = i18n.t("email.welcome_footer", {
-    lng,
-    defaultValue: "All rights reserved.",
-  });
+  const footer = t("email.welcome_footer");
 
   return {
     subject,

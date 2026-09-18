@@ -15,7 +15,7 @@ import { DocumentRequestModel, DocumentRequestStatus } from "../../../document-r
 import { ComplaintModel } from "../../../complaints/infrastructure/models/ComplaintModel";
 import { ComplaintStatus } from "../../../complaints/domain/entities/Complaint";
 import { ApartmentModel } from "../../../apartments/infrastructure/models/ApartmentModel";
-import i18n from "../../../../shared/config/i18n";
+import { buildTenancyRevokedEmailTemplate } from "../templates/tenancyRevokedEmailTemplate";
 
 export class RevokeTenancyUseCase {
   constructor(
@@ -118,63 +118,16 @@ export class RevokeTenancyUseCase {
         }
       }
 
-      const societyName = process.env.SOCIETY_NAME || "Civic Horizon";
-      const lng = tenantUser?.preferredLanguage || "en";
-
-      const subject = i18n.t("email.tenancy_revoked_subject", {
-        lng,
-        societyName,
-        defaultValue: `Tenancy Revoked — ${societyName}`,
-      });
-      const header = i18n.t("email.tenancy_revoked_header", {
-        lng,
-        defaultValue: "Tenancy Revoked",
-      });
-      const greeting = i18n.t("email.welcome_greeting", {
-        lng,
+      const { subject, html } = buildTenancyRevokedEmailTemplate({
         name: tenantName,
-        defaultValue: `Hello ${tenantName},`,
-      });
-      const body = i18n.t("email.tenancy_revoked_body", {
-        lng,
         unitName,
-        societyName,
-        defaultValue: `This is to inform you that your tenancy for unit ${unitName} at ${societyName} has been ended by the apartment owner.`,
-      });
-      const note = i18n.t("email.tenancy_revoked_deactivated", {
-        lng,
-        societyName,
-        defaultValue: `Your account access and active credentials for ${societyName} have been deactivated.`,
-      });
-      const footer = i18n.t("email.welcome_footer", {
-        lng,
-        defaultValue: "All rights reserved.",
+        preferredLanguage: tenantUser?.preferredLanguage,
       });
 
       this.emailService.sendEmail({
         to: tenantEmail,
         subject,
-        html: `
-          <div style="font-family: Arial, sans-serif; background-color: #f4f6f8; padding: 30px; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-              <div style="background-color: #1a1f36; padding: 24px; text-align: center;">
-                <h2 style="color: #ffffff; margin: 0; font-size: 22px;">${header}</h2>
-              </div>
-              <div style="padding: 30px;">
-                <p style="font-size: 16px; margin-top: 0;">${greeting}</p>
-                <p style="font-size: 15px; color: #555;">
-                  ${body}
-                </p>
-                <p style="font-size: 14px; color: #666; margin-top: 15px;">
-                  ${note}
-                </p>
-              </div>
-              <div style="background-color: #f1f3f5; padding: 16px; text-align: center; font-size: 12px; color: #888;">
-                <p style="margin: 0;">© ${new Date().getFullYear()} ${societyName}. ${footer}</p>
-              </div>
-            </div>
-          </div>
-        `,
+        html,
       }).catch((err) => console.error("[RevokeTenancyUseCase] Failed to send revocation email:", err));
     }
   }
