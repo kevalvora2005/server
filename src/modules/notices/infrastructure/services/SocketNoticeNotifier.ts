@@ -17,7 +17,11 @@ export class SocketNoticeNotifier implements INoticeNotifier {
             "notice_created",
             "New Notice",
             notice.title,
-            { noticeId: notice.id }
+            {
+              noticeId: notice.id,
+              key: "notification.notice_created",
+              params: { title: notice.title },
+            }
           )
         )
       );

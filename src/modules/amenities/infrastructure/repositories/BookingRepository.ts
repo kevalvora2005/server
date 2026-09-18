@@ -27,7 +27,7 @@ const bookingIncludes = [
       {
         model: UserModel,
         as: "user",
-        attributes: ["id", "name", "email", "phone"],
+        attributes: ["id", "name", "email", "phone", "preferredLanguage", "locale"],
       },
       {
         model: ApartmentModel,
@@ -58,6 +58,8 @@ export class BookingRepository implements IBookingRepository {
             name: rawUser.name,
             email: rawUser.email,
             phone: rawUser.phone,
+            preferredLanguage: rawUser.preferredLanguage,
+            locale: rawUser.locale,
           }
         : null;
 

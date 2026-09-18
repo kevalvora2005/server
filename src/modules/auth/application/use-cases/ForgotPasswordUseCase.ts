@@ -17,4 +17,4 @@ export class ForgotPasswordUseCase {
 
     await this.cognitoAuthService.forgotPassword(user.email);
   }
-}
+}

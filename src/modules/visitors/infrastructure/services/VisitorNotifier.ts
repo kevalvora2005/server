@@ -17,7 +17,11 @@ export class VisitorNotifier implements IVisitorNotifier {
       "visitor_approval_needed",
       "Visitor at the gate",
       `${visitor.name} is at the gate for "${visitor.purpose}". Approve or reject entry.`,
-      { visitorId: visitor.id }
+      {
+        visitorId: visitor.id,
+        key: "notification.visitor_gate",
+        params: { name: visitor.name, purpose: visitor.purpose },
+      }
     );
   }
 
@@ -30,7 +34,11 @@ export class VisitorNotifier implements IVisitorNotifier {
       "visitor_approval_timed_out",
       "Visitor request expired",
       `Your approval request for ${visitor.name} timed out and was automatically rejected.`,
-      { visitorId: visitor.id }
+      {
+        visitorId: visitor.id,
+        key: "notification.visitor_timeout",
+        params: { name: visitor.name },
+      }
     );
   }
 
@@ -43,7 +51,11 @@ export class VisitorNotifier implements IVisitorNotifier {
       "visitor_checked_in",
       "Visitor arrived",
       `${visitor.name} has checked in at the gate.`,
-      { visitorId: visitor.id }
+      {
+        visitorId: visitor.id,
+        key: "notification.visitor_checked_in",
+        params: { name: visitor.name },
+      }
     );
   }
 
@@ -56,7 +68,12 @@ export class VisitorNotifier implements IVisitorNotifier {
       "visitor_rejected",
       "Visitor Entry Rejected",
       `${visitor.name}'s entry request for "${visitor.purpose}" was rejected.`,
-      { visitorId: visitor.id, status: "Rejected" }
+      {
+        visitorId: visitor.id,
+        status: "Rejected",
+        key: "notification.visitor_rejected",
+        params: { name: visitor.name, purpose: visitor.purpose },
+      }
     );
   }
 

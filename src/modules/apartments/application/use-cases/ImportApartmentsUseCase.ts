@@ -44,13 +44,13 @@ export class ImportApartmentsUseCase {
 
     const failedItems: FailedImportItem[] = [];
 
-    // Helper to extract cell values case-insensitively with header variations
+    // Helper to extract cell values case-insensitively with header variations across languages
     const getCellValue = (row: Record<string, unknown>, candidateKeys: string[]): unknown => {
       const keys = Object.keys(row);
       for (const candidate of candidateKeys) {
-        const cleanCandidate = candidate.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const cleanCandidate = candidate.trim().toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
         const matchKey = keys.find(
-          (k) => k.trim().toLowerCase().replace(/[^a-z0-9]/g, "") === cleanCandidate
+          (k) => k.trim().toLowerCase().replace(/[^\p{L}\p{N}]/gu, "") === cleanCandidate
         );
         if (matchKey && row[matchKey] !== undefined && row[matchKey] !== null) {
           const valStr = String(row[matchKey]).trim();
@@ -87,11 +87,11 @@ export class ImportApartmentsUseCase {
       const row = rows[index];
       const rowNum = index + 2; // Data starts at Row 2
 
-      const rawBlock = getCellValue(row, ["Block", "block", "Block Name"]);
-      const rawFloor = getCellValue(row, ["Floor Number", "Floor", "floorNumber", "floor"]);
-      const rawUnit = getCellValue(row, ["Unit Number", "Unit", "unitNumber", "Flat Number", "unit"]);
-      const rawArea = getCellValue(row, ["Area (Sqft)", "Area", "areaSqft", "area_sqft", "sqft"]);
-      const rawType = getCellValue(row, ["Type (BHK)", "Type BHK", "Type", "Apartment Type", "type", "BHK"]);
+      const rawBlock = getCellValue(row, ["Block", "block", "Block Name", "ब्लॉक", "બ્લોક"]);
+      const rawFloor = getCellValue(row, ["Floor Number", "Floor", "floorNumber", "floor", "मंजिल", "માળ"]);
+      const rawUnit = getCellValue(row, ["Unit Number", "Unit", "unitNumber", "Flat Number", "unit", "इकाई", "फ्लैट", "એકમ", "ફ્લેટ"]);
+      const rawArea = getCellValue(row, ["Area (Sqft)", "Area", "areaSqft", "area_sqft", "sqft", "क्षेत्रफल", "વિસ્તાર"]);
+      const rawType = getCellValue(row, ["Type (BHK)", "Type BHK", "Type", "Apartment Type", "type", "BHK", "प्रकार", "પ્રકાર"]);
 
       // Skip completely blank or unpopulated pre-formatted rows
       const hasBlock = rawBlock !== undefined && rawBlock !== null && String(rawBlock).trim() !== "";
@@ -115,11 +115,11 @@ export class ImportApartmentsUseCase {
       // Normalize apartment type
       let type: ApartmentType | undefined = undefined;
       if (rawType !== undefined && rawType !== null) {
-        const cleanType = String(rawType).trim().toLowerCase().replace(/[^a-z0-9]/g, "");
-        if (cleanType.includes("1bhk") || cleanType === "1") type = ApartmentType.ONE_BHK;
-        else if (cleanType.includes("2bhk") || cleanType === "2") type = ApartmentType.TWO_BHK;
-        else if (cleanType.includes("3bhk") || cleanType === "3") type = ApartmentType.THREE_BHK;
-        else if (cleanType.includes("4bhk") || cleanType === "4") type = ApartmentType.FOUR_BHK;
+        const cleanType = String(rawType).trim().toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+        if (cleanType.includes("1bhk") || cleanType.includes("1बीएचके") || cleanType.includes("1બીએચકે") || cleanType === "1") type = ApartmentType.ONE_BHK;
+        else if (cleanType.includes("2bhk") || cleanType.includes("2बीएचके") || cleanType.includes("2બીએચકે") || cleanType === "2") type = ApartmentType.TWO_BHK;
+        else if (cleanType.includes("3bhk") || cleanType.includes("3बीएचके") || cleanType.includes("3બીએચકે") || cleanType === "3") type = ApartmentType.THREE_BHK;
+        else if (cleanType.includes("4bhk") || cleanType.includes("4बीएचકે") || cleanType.includes("4બીએચકે") || cleanType === "4") type = ApartmentType.FOUR_BHK;
         else {
           const directMatch = validTypes.find((t) => t.toLowerCase() === cleanType);
           if (directMatch) type = directMatch;

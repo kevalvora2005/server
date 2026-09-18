@@ -11,12 +11,24 @@ export class ComplaintNotifier implements IComplaintNotifier {
       const resident = complaint.resident as { userId?: number } | undefined;
       if (!resident?.userId) return;
 
+      const ticketNumber = `#CMP-${String(complaint.id).padStart(4, "0")}`;
+      let key = "notification.complaint_status_changed";
+      let params: Record<string, any> = { ticketNumber, status: complaint.status };
+
+      if (complaint.status === "Resolved") {
+        key = "notification.complaint_resolved";
+        params = { ticketNumber };
+      } else if (complaint.status === "In Progress") {
+        key = "notification.complaint_assigned";
+        params = { ticketNumber };
+      }
+
       await notificationService.notify(
         resident.userId,
         "complaint_status_changed",
         "Complaint Updated",
         `"${complaint.title}" \u2192 ${complaint.status}`,
-        { complaintId: complaint.id, status: complaint.status }
+        { complaintId: complaint.id, status: complaint.status, key, params }
       );
     } catch (err) {
       console.error("Failed to create complaint notification", err);
@@ -32,6 +44,7 @@ export class ComplaintNotifier implements IComplaintNotifier {
 
       const relRes = resident as (ResidentModel & { user?: { name?: string } }) | null;
       const residentName = relRes?.user?.name ?? `Resident #${complaint.residentId}`;
+      const ticketNumber = `#CMP-${String(complaint.id).padStart(4, "0")}`;
 
       const admins = await UserModel.findAll({ where: { role: UserRole.ADMIN } });
 
@@ -42,7 +55,11 @@ export class ComplaintNotifier implements IComplaintNotifier {
             "complaint_created",
             "New Complaint",
             `${residentName}: ${complaint.title}`,
-            { complaintId: complaint.id }
+            {
+              complaintId: complaint.id,
+              key: "notification.complaint_lodged",
+              params: { ticketNumber, title: complaint.title },
+            }
           )
         )
       );
@@ -64,6 +81,8 @@ export class ComplaintNotifier implements IComplaintNotifier {
         ? `${commentContent.slice(0, 60)}...`
         : commentContent;
 
+      const ticketNumber = `#CMP-${String(complaint.id).padStart(4, "0")}`;
+
       if (senderUserId === residentUserId) {
         const residentName = relRes?.user?.name ?? `Resident #${complaint.residentId}`;
         const admins = await UserModel.findAll({ where: { role: UserRole.ADMIN } });
@@ -75,7 +94,11 @@ export class ComplaintNotifier implements IComplaintNotifier {
               "complaint_comment_added",
               "New Complaint Message",
               `${residentName}: ${bodyPreview}`,
-              { complaintId: complaint.id }
+              {
+                complaintId: complaint.id,
+                key: "notification.complaint_comment",
+                params: { ticketNumber, sender: residentName, preview: bodyPreview },
+              }
             )
           )
         );
@@ -89,7 +112,11 @@ export class ComplaintNotifier implements IComplaintNotifier {
             "complaint_comment_added",
             "New Complaint Message",
             `${senderName}: ${bodyPreview}`,
-            { complaintId: complaint.id }
+            {
+              complaintId: complaint.id,
+              key: "notification.complaint_comment",
+              params: { ticketNumber, sender: senderName, preview: bodyPreview },
+            }
           );
         }
       }

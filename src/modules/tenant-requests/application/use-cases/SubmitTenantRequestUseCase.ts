@@ -52,7 +52,11 @@ export class SubmitTenantRequestUseCase {
             "tenant_request_submitted",
             "New tenant request",
             `${request.tenantName} has been proposed as a tenant. Review and record committee votes.`,
-            { tenantRequestId: request.id }
+            {
+              tenantRequestId: request.id,
+              key: "notification.tenant_request_submitted",
+              params: { tenantName: request.tenantName },
+            }
           )
         )
       );

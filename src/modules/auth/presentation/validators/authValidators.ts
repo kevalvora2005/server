@@ -78,17 +78,20 @@ const resetPasswordSchema = Joi.object({
 });
 
 const updateProfileSchema = Joi.object({
-  name: Joi.string().trim().min(2).required().messages({
-    'string.empty': 'Name is required',
+  name: Joi.string().trim().min(2).optional().messages({
+    'string.empty': 'Name cannot be empty',
     'string.min': 'Name must be at least 2 characters',
   }),
 
-  phone: Joi.string().trim().length(10).pattern(/^[0-9]+$/).required().messages({
-    'string.empty': 'Phone is required',
+  phone: Joi.string().trim().length(10).pattern(/^[0-9]+$/).optional().messages({
+    'string.empty': 'Phone cannot be empty',
     'string.length': 'Phone must be exactly 10 digits',
     'string.pattern.base': 'Phone must contain only numbers',
   }),
-});
+
+  preferredLanguage: Joi.string().trim().valid("en", "hi", "gu").optional(),
+  locale: Joi.string().trim().max(10).optional(),
+}).min(1);
 
 const changePasswordSchema = Joi.object({
   currentPassword: Joi.string().required().messages({

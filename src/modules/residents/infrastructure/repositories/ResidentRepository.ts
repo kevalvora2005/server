@@ -50,7 +50,7 @@ export class ResidentRepository implements IResidentRepository {
         {
           model: UserModel,
           as: "user",
-          attributes: ["id", "name", "email", "phone"],
+          attributes: ["id", "name", "email", "phone", "preferredLanguage", "locale"],
         },
         {
           model: ApartmentModel,
@@ -114,7 +114,7 @@ export class ResidentRepository implements IResidentRepository {
         {
           model: UserModel,
           as: "user",
-          attributes: ["id", "name", "email", "phone"],
+          attributes: ["id", "name", "email", "phone", "preferredLanguage", "locale"],
           where: userWhere,
           required: userWhere ? true : false,
         },
@@ -151,7 +151,7 @@ export class ResidentRepository implements IResidentRepository {
         {
           model: UserModel,
           as: "user",
-          attributes: ["id", "name", "email", "phone"],
+          attributes: ["id", "name", "email", "phone", "preferredLanguage", "locale"],
         },
       ],
     });
@@ -220,7 +220,7 @@ export class ResidentRepository implements IResidentRepository {
         {
           model: UserModel,
           as: "user",
-          attributes: ["id", "name", "email", "phone"],
+          attributes: ["id", "name", "email", "phone", "preferredLanguage", "locale"],
         },
       ],
     });
@@ -238,7 +238,7 @@ export class ResidentRepository implements IResidentRepository {
         {
           model: UserModel,
           as: "user",
-          attributes: ["id", "name", "email", "phone"],
+          attributes: ["id", "name", "email", "phone", "preferredLanguage", "locale"],
         },
       ],
       order: [["moveInDate", "DESC"]],

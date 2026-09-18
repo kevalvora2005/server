@@ -12,8 +12,12 @@ export class UpdateProfileUseCase {
       throw new AppError("User not found or inactive", 404);
     }
 
-    user.updateName(dto.name);
-    user.updatePhone(dto.phone);
+    if (dto.name) {
+      user.updateName(dto.name);
+    }
+    if (dto.phone) {
+      user.updatePhone(dto.phone);
+    }
     if (dto.preferredLanguage || dto.locale) {
       user.updateLanguageAndLocale(dto.preferredLanguage, dto.locale);
     }

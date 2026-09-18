@@ -24,6 +24,7 @@ export interface CreatedResidentEmailItem {
   name: string;
   unit: string;
   temporaryPassword?: string;
+  preferredLanguage?: string;
   status: "pending" | "sending" | "sent" | "failed";
   error?: string;
 }
@@ -68,9 +69,9 @@ export class ImportResidentsUseCase {
     const getCellValue = (row: Record<string, unknown>, candidateKeys: string[]): unknown => {
       const keys = Object.keys(row);
       for (const candidate of candidateKeys) {
-        const cleanCandidate = candidate.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const cleanCandidate = candidate.trim().toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
         const matchKey = keys.find(
-          (k) => k.trim().toLowerCase().replace(/[^a-z0-9]/g, "") === cleanCandidate
+          (k) => k.trim().toLowerCase().replace(/[^\p{L}\p{N}]/gu, "") === cleanCandidate
         );
         if (matchKey && row[matchKey] !== undefined && row[matchKey] !== null) {
           const valStr = String(row[matchKey]).trim();
@@ -90,19 +91,21 @@ export class ImportResidentsUseCase {
       floorNumber: number;
       unitNumber: string;
       isCommitteeMember: boolean;
+      preferredLanguage: string;
     }[] = [];
 
     for (let index = 0; index < rows.length; index++) {
       const row = rows[index];
       const rowNum = index + 2;
 
-      const rawName = getCellValue(row, ["Name", "name", "Full Name"]);
-      const rawEmail = getCellValue(row, ["Email", "email", "Email Address"]);
-      const rawPhone = getCellValue(row, ["Phone", "phone", "Mobile", "Contact"]);
-      const rawBlock = getCellValue(row, ["Block", "block", "Block Name"]);
-      const rawFloor = getCellValue(row, ["Floor Number", "Floor", "floorNumber", "floor"]);
-      const rawUnit = getCellValue(row, ["Unit Number", "Unit", "unitNumber", "Flat Number", "unit"]);
-      const rawCommittee = getCellValue(row, ["Is Committee Member", "Committee Member", "isCommitteeMember", "Committee"]);
+      const rawName = getCellValue(row, ["Name", "name", "Full Name", "नाम", "पूरा नाम", "નામ", "પૂરું નામ"]);
+      const rawEmail = getCellValue(row, ["Email", "email", "Email Address", "ईमेल", "ઇમેઇલ"]);
+      const rawPhone = getCellValue(row, ["Phone", "phone", "Mobile", "Contact", "फ़ोन", "फोन", "मोबाइल", "મોબાઇલ", "સંપર્ક"]);
+      const rawBlock = getCellValue(row, ["Block", "block", "Block Name", "ब्लॉक", "બ્લોક"]);
+      const rawFloor = getCellValue(row, ["Floor Number", "Floor", "floorNumber", "floor", "मंजिल", "માળ"]);
+      const rawUnit = getCellValue(row, ["Unit Number", "Unit", "unitNumber", "Flat Number", "unit", "इकाई", "फ्लैट", "એકમ", "ફ્લેટ"]);
+      const rawCommittee = getCellValue(row, ["Is Committee Member", "Committee Member", "isCommitteeMember", "Committee", "समिति सदस्य", "સમિતિ સભ્ય"]);
+      const rawLang = getCellValue(row, ["Language", "language", "Preferred Language", "भाषा", "ભાષા"]);
 
       if (rawName === undefined && rawEmail === undefined && rawPhone === undefined && rawBlock === undefined && rawFloor === undefined && rawUnit === undefined) {
         continue;
@@ -118,9 +121,16 @@ export class ImportResidentsUseCase {
       let isCommitteeMember = false;
       if (rawCommittee !== undefined && rawCommittee !== null) {
         const str = String(rawCommittee).trim().toLowerCase();
-        if (["yes", "y", "true", "1"].includes(str)) {
+        if (["yes", "y", "true", "1", "हाँ", "હા"].includes(str)) {
           isCommitteeMember = true;
         }
+      }
+
+      let preferredLanguage = "en";
+      if (rawLang) {
+        const l = String(rawLang).trim().toLowerCase();
+        if (l.startsWith("hi") || l === "हिन्दी") preferredLanguage = "hi";
+        else if (l.startsWith("gu") || l === "ગુજરાતી") preferredLanguage = "gu";
       }
 
       let rawPhoneStr = rawPhone !== undefined && rawPhone !== null ? String(rawPhone).trim() : undefined;
@@ -157,6 +167,7 @@ export class ImportResidentsUseCase {
           floorNumber: value.floorNumber,
           unitNumber: value.unitNumber,
           isCommitteeMember: value.isCommitteeMember ?? isCommitteeMember,
+          preferredLanguage,
         });
       }
     }
@@ -299,6 +310,8 @@ export class ImportResidentsUseCase {
               role: UserRole.RESIDENT,
               isActive: true,
               mustResetPassword: true,
+              preferredLanguage: item.preferredLanguage,
+              locale: item.preferredLanguage === "hi" ? "hi-IN" : item.preferredLanguage === "gu" ? "gu-IN" : "en-IN",
             },
             { transaction }
           );
@@ -330,6 +343,7 @@ export class ImportResidentsUseCase {
           name: item.name,
           unit: unitLabel,
           temporaryPassword: item.password,
+          preferredLanguage: item.preferredLanguage,
           status: "pending",
         });
       } catch (err: unknown) {
@@ -352,6 +366,7 @@ export class ImportResidentsUseCase {
               email: item.email,
               unitName: item.unit,
               temporaryPassword: item.temporaryPassword || "",
+              preferredLanguage: item.preferredLanguage,
             });
 
             await this.emailService!.sendEmail({

@@ -55,6 +55,7 @@ export interface NotificationProps {
   type: NotificationType;
   title: string;
   body: string;
+  messageKey?: string;
   data: Record<string, unknown>;
   isRead: boolean;
   createdAt: Date;
@@ -72,6 +73,7 @@ export class Notification {
   ): Notification {
     return new Notification({
       ...props,
+      messageKey: props.messageKey || (props.data?.key as string) || (props.data?.messageKey as string) || undefined,
       isRead: false,
       createdAt: new Date(),
     });
@@ -97,6 +99,10 @@ export class Notification {
     return this.props.body;
   }
 
+  get messageKey(): string | undefined {
+    return this.props.messageKey || (this.props.data?.key as string) || (this.props.data?.messageKey as string);
+  }
+
   get data(): Record<string, unknown> {
     return this.props.data;
   }
@@ -120,6 +126,7 @@ export class Notification {
       type: this.props.type,
       title: this.props.title,
       body: this.props.body,
+      messageKey: this.messageKey,
       data: this.props.data,
       isRead: this.props.isRead,
       createdAt: this.props.createdAt,

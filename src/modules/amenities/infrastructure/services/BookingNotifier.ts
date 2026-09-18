@@ -14,7 +14,8 @@ export class BookingNotifier implements IBookingNotifier {
     booking: Booking,
     type: NotificationType,
     title: string,
-    body: string
+    body: string,
+    data?: Record<string, any>
   ): Promise<void> {
     try {
       const resident = await this.residentRepository.findById(booking.residentId);
@@ -22,6 +23,7 @@ export class BookingNotifier implements IBookingNotifier {
       await notificationService.notify(resident.userId, type, title, body, {
         bookingId: booking.id,
         amenityId: booking.amenityId,
+        ...data,
       });
     } catch (error) {
       console.error("Failed to send resident booking notification:", error);
@@ -32,7 +34,8 @@ export class BookingNotifier implements IBookingNotifier {
     booking: Booking,
     type: NotificationType,
     title: string,
-    body: string
+    body: string,
+    data?: Record<string, any>
   ): Promise<void> {
     try {
       const admins = await UserModel.findAll({ where: { role: UserRole.ADMIN } });
@@ -41,6 +44,7 @@ export class BookingNotifier implements IBookingNotifier {
           notificationService.notify(admin.id, type, title, body, {
             bookingId: booking.id,
             amenityId: booking.amenityId,
+            ...data,
           })
         )
       );
@@ -54,7 +58,11 @@ export class BookingNotifier implements IBookingNotifier {
       booking,
       "booking_requested",
       "New Booking Request",
-      `${amenity.name} was requested by a resident for ${booking.bookingDate} (${booking.startTime}-${booking.endTime}). Please review.`
+      `${amenity.name} was requested by a resident for ${booking.bookingDate} (${booking.startTime}-${booking.endTime}). Please review.`,
+      {
+        key: "notification.booking_requested",
+        params: { amenityName: amenity.name, date: booking.bookingDate },
+      }
     );
   }
 
@@ -63,7 +71,11 @@ export class BookingNotifier implements IBookingNotifier {
       booking,
       "booking_confirmed",
       "Booking Confirmed",
-      `Your booking for ${amenity.name} on ${booking.bookingDate} is confirmed.`
+      `Your booking for ${amenity.name} on ${booking.bookingDate} is confirmed.`,
+      {
+        key: "notification.booking_confirmed",
+        params: { amenityName: amenity.name, date: booking.bookingDate },
+      }
     );
   }
 
@@ -72,7 +84,11 @@ export class BookingNotifier implements IBookingNotifier {
       booking,
       "booking_rejected",
       "Booking Rejected",
-      `Your booking for ${amenity.name} was rejected.${booking.rejectionReason ? ` Reason: ${booking.rejectionReason}` : ""}`
+      `Your booking for ${amenity.name} was rejected.${booking.rejectionReason ? ` Reason: ${booking.rejectionReason}` : ""}`,
+      {
+        key: "notification.booking_rejected",
+        params: { amenityName: amenity.name },
+      }
     );
   }
 
@@ -81,7 +97,11 @@ export class BookingNotifier implements IBookingNotifier {
       booking,
       "booking_cancelled",
       "Booking Cancelled",
-      `A booking for ${amenity.name} on ${booking.bookingDate} was cancelled.${booking.cancellationReason ? ` Reason: ${booking.cancellationReason}` : ""}`
+      `A booking for ${amenity.name} on ${booking.bookingDate} was cancelled.${booking.cancellationReason ? ` Reason: ${booking.cancellationReason}` : ""}`,
+      {
+        key: "notification.booking_cancelled",
+        params: { amenityName: amenity.name, date: booking.bookingDate },
+      }
     );
   }
 
@@ -90,7 +110,11 @@ export class BookingNotifier implements IBookingNotifier {
       booking,
       "booking_reminder",
       "Booking Reminder",
-      `Reminder: your booking for ${amenity.name} is on ${booking.bookingDate} at ${booking.startTime}.`
+      `Reminder: your booking for ${amenity.name} is on ${booking.bookingDate} at ${booking.startTime}.`,
+      {
+        key: "notification.booking_reminder",
+        params: { amenityName: amenity.name, date: booking.bookingDate, time: booking.startTime },
+      }
     );
   }
 
@@ -99,13 +123,21 @@ export class BookingNotifier implements IBookingNotifier {
       booking,
       "booking_payment_succeeded",
       "Payment Successful",
-      `Payment for your ${amenity.name} booking on ${booking.bookingDate} is complete.`
+      `Payment for your ${amenity.name} booking on ${booking.bookingDate} is complete.`,
+      {
+        key: "notification.booking_payment_succeeded",
+        params: { amenityName: amenity.name, date: booking.bookingDate },
+      }
     );
     await this.notifyAdmins(
       booking,
       "booking_payment_succeeded",
       "Booking Paid",
-      `A resident paid for the ${amenity.name} booking on ${booking.bookingDate}.`
+      `A resident paid for the ${amenity.name} booking on ${booking.bookingDate}.`,
+      {
+        key: "notification.booking_paid_admin",
+        params: { amenityName: amenity.name, date: booking.bookingDate },
+      }
     );
   }
 }

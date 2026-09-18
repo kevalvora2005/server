@@ -15,7 +15,14 @@ export class MaintenanceNotifier implements IMaintenanceNotifier {
       "maintenance_due_soon",
       "Maintenance due in 3 days",
       `Your maintenance of ₹${invoice.totalAmount.toFixed(2)} is due on ${this.formatDate(invoice.dueDate)}.`,
-      { invoiceId: invoice.id }
+      {
+        invoiceId: invoice.id,
+        key: "notification.maintenance_due_soon",
+        params: {
+          amount: `₹${invoice.totalAmount.toFixed(2)}`,
+          dueDate: this.formatDate(invoice.dueDate),
+        },
+      }
     );
   }
 
@@ -28,7 +35,13 @@ export class MaintenanceNotifier implements IMaintenanceNotifier {
       "maintenance_due_today",
       "Maintenance due today",
       `Your maintenance of ₹${invoice.totalAmount.toFixed(2)} is due today.`,
-      { invoiceId: invoice.id }
+      {
+        invoiceId: invoice.id,
+        key: "notification.maintenance_due_today",
+        params: {
+          amount: `₹${invoice.totalAmount.toFixed(2)}`,
+        },
+      }
     );
   }
 
@@ -36,12 +49,21 @@ export class MaintenanceNotifier implements IMaintenanceNotifier {
     const userId = await this.resolveUserId(invoice);
     if (!userId) return;
 
+    const monthName = new Date(invoice.year, invoice.month - 1).toLocaleString("en-IN", { month: "long" });
+
     await notificationService.notify(
       userId,
       "maintenance_overdue",
       "Maintenance overdue",
       `Your maintenance payment is overdue. A 5% late fee now applies. Total due: ₹${invoice.totalAmount.toFixed(2)}.`,
-      { invoiceId: invoice.id }
+      {
+        invoiceId: invoice.id,
+        key: "notification.maintenance_overdue",
+        params: {
+          amount: `₹${invoice.totalAmount.toFixed(2)}`,
+          month: monthName,
+        },
+      }
     );
   }
 
@@ -49,12 +71,21 @@ export class MaintenanceNotifier implements IMaintenanceNotifier {
     const userId = await this.resolveUserId(invoice);
     if (!userId) return;
 
+    const monthName = new Date(invoice.year, invoice.month - 1).toLocaleString("en-IN", { month: "long" });
+
     await notificationService.notify(
       userId,
       "maintenance_overdue_reminder",
       "Maintenance still overdue",
       `Your maintenance payment is still overdue. Current amount due: ₹${invoice.totalAmount.toFixed(2)}.`,
-      { invoiceId: invoice.id }
+      {
+        invoiceId: invoice.id,
+        key: "notification.maintenance_overdue",
+        params: {
+          amount: `₹${invoice.totalAmount.toFixed(2)}`,
+          month: monthName,
+        },
+      }
     );
   }
 
@@ -67,7 +98,14 @@ export class MaintenanceNotifier implements IMaintenanceNotifier {
       "maintenance_payment_succeeded",
       "Payment Successful",
       `Your maintenance payment of ₹${invoice.totalAmount.toFixed(2)} has been completed successfully. Receipt available for download.`,
-      { invoiceId: invoice.id }
+      {
+        invoiceId: invoice.id,
+        key: "notification.payment_receipt",
+        params: {
+          amount: `₹${invoice.totalAmount.toFixed(2)}`,
+          invoiceNumber: `#${String(invoice.id).padStart(4, "0")}`,
+        },
+      }
     );
   }
 

@@ -6,6 +6,8 @@ export interface BookingResidentInfo {
   name: string;
   email?: string;
   phone?: string;
+  preferredLanguage?: string;
+  locale?: string;
 }
 
 export interface BookingApartmentInfo {

@@ -189,6 +189,7 @@ export class FinalizeTenantRequestUseCase {
       email: savedTenantUser.email,
       unitName,
       temporaryPassword: rawPassword,
+      preferredLanguage: savedTenantUser.preferredLanguage,
     });
 
     await this.emailService.sendEmail({
@@ -212,8 +213,14 @@ export class FinalizeTenantRequestUseCase {
     body: string
   ): Promise<void> {
     try {
+      const key =
+        type === "tenant_request_approved"
+          ? "notification.tenancy_approved"
+          : "notification.tenancy_rejected";
       await notificationService.notify(userId, type, title, body, {
         tenantRequestId,
+        key,
+        params: {},
       });
     } catch (error) {
       console.error("Failed to send tenant request notification", error);
