@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 
 import { errorHandler } from "./shared/middleware/errorHandler";
+import { i18nMiddleware } from "./shared/middleware/i18nMiddleware";
 import routes from "./routes";
 
 const app = express();
@@ -25,6 +26,8 @@ app.use(
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
+
+app.use(i18nMiddleware);
 
 /*
 |--------------------------------------------------------------------------

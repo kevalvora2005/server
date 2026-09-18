@@ -71,6 +71,8 @@ export const jwtMiddleware = async (
       locale: user.locale,
     };
 
+    (req as AuthenticatedRequest).language = user.preferredLanguage || "en";
+
     if (user.mustResetPassword) {
       res.status(403).json(
         ApiResponse.error("Password reset required before accessing this resource.")

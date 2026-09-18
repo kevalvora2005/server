@@ -11,4 +11,5 @@ export interface AuthenticatedRequest extends Request {
     preferredLanguage: string;
     locale: string;
   };
+  language?: string;
 }
