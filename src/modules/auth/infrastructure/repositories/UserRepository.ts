@@ -64,6 +64,8 @@ export class UserRepository implements IUserRepository {
       role: user.role,
       isActive: user.isActive,
       mustResetPassword: user.mustResetPassword,
+      preferredLanguage: user.preferredLanguage,
+      locale: user.locale,
     });
 
     return this.toEntity(createdModel);
@@ -83,6 +85,8 @@ export class UserRepository implements IUserRepository {
         role: user.role,
         isActive: user.isActive,
         mustResetPassword: user.mustResetPassword,
+        preferredLanguage: user.preferredLanguage,
+        locale: user.locale,
       },
       {
         where: { id: user.id },
@@ -114,6 +118,8 @@ export class UserRepository implements IUserRepository {
       role: model.role,
       isActive: model.isActive,
       mustResetPassword: model.mustResetPassword,
+      preferredLanguage: model.preferredLanguage,
+      locale: model.locale,
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
     });

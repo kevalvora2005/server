@@ -16,6 +16,8 @@ export interface UserResponseDto {
   role: UserRole;
   isActive: boolean;
   mustResetPassword?: boolean;
+  preferredLanguage?: string;
+  locale?: string;
   createdAt: Date;
   residentId?: number | null;
   resident?: ResidentSummaryDto | null;

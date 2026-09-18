@@ -59,5 +59,3 @@ export class ExpiredResetTokenError extends AppError {
     super("Reset token has expired. Please request a new one.", 400);
   }
 }
-
-export { AppError };

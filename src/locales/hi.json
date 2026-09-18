@@ -1,0 +1,73 @@
+{
+  "email": {
+    "welcome_subject": "सिविक होराइजन में आपका स्वागत है - आपके खाता विवरण",
+    "welcome_greeting": "नमस्ते {{name}},",
+    "welcome_body": "अपार्टमेंट {{apartment}} के लिए आपका निवासी खाता बना दिया गया है।",
+    "welcome_temp_pass": "आपका अस्थायी पासवर्ड है:",
+    "welcome_login_cta": "कृपया लॉग इन करें और तुरंत अपना पासवर्ड बदलें।",
+    "password_reset_subject": "पासवर्ड रीसेट सत्यापन कोड",
+    "password_reset_greeting": "नमस्ते {{name}},",
+    "password_reset_code": "आपका पासवर्ड रीसेट सत्यापन कोड है: {{code}}",
+    "password_reset_expiry": "यह कोड {{minutes}} मिनट में समाप्त हो जाएगा।",
+    "tenancy_approved_subject": "किरायेदारी अनुरोध स्वीकृत",
+    "tenancy_rejected_subject": "किरायेदारी अनुरोध अस्वीकृत",
+    "tenancy_revoked_subject": "किरायेदारी समाप्त कर दी गई"
+  },
+  "notification": {
+    "visitor_gate": "{{name}} {{purpose}} के लिए मुख्य द्वार पर है।",
+    "complaint_lodged": "शिकायत {{ticketNumber}} दर्ज की गई: {{title}}।",
+    "complaint_assigned": "शिकायत {{ticketNumber}} तकनीशियन को सौंपी गई।",
+    "complaint_resolved": "शिकायत {{ticketNumber}} का समाधान हो गया है।",
+    "maintenance_overdue": "{{month}} के लिए {{amount}} का रखरखाव बकाया अतिदेय है।",
+    "payment_receipt": "चालान {{invoiceNumber}} के लिए {{amount}} का भुगतान प्राप्त हुआ।",
+    "booking_requested": "निवासी द्वारा {{date}} के लिए {{amenityName}} का अनुरोध किया गया था।",
+    "booking_confirmed": "{{date}} को {{amenityName}} के लिए आपकी बुकिंग की पुष्टि हो गई है।",
+    "booking_rejected": "{{amenityName}} के लिए आपकी बुकिंग अस्वीकार कर दी गई।"
+  },
+  "invoice": {
+    "title": "रखरखाव चालान",
+    "invoice_number": "चालान संख्या",
+    "date": "दिनांक",
+    "due_date": "नियत तारीख",
+    "bill_to": "बिल प्राप्तकर्ता",
+    "apartment": "अपार्टमेंट",
+    "description": "विवरण",
+    "amount": "राशि",
+    "subtotal": "उप-योग",
+    "extra_charges": "अतिरिक्त शुल्क",
+    "tax": "कर",
+    "total": "कुल राशि",
+    "status_paid": "भुगतान किया",
+    "status_unpaid": "अदत्त",
+    "status_overdue": "अतिदेय",
+    "status_partial": "आंशिक",
+    "terms": "नियम एवं शर्तें",
+    "terms_text": "भुगतान नियत तारीख तक देय है। नियत तारीख के बाद विलंब शुल्क लागू हो सकता है।",
+    "payment_methods": {
+      "online": "ऑनलाइन कार्ड भुगतान",
+      "cheque": "चेक",
+      "upi": "यूपीआई",
+      "cash": "नकद / मैन्युअल"
+    }
+  },
+  "booking": {
+    "pass_title": "सुविधा बुकिंग पास",
+    "amenity": "सुविधा",
+    "date": "दिनांक",
+    "time_slot": "समय स्लॉट",
+    "status": "स्थिति",
+    "resident": "निवासी",
+    "apartment": "अपार्टमेंट",
+    "amount": "भुगतान की गई राशि",
+    "rules": "सुविधा नियम एवं दिशानिर्देश",
+    "rules_text": "कृपया इस पास को साथ रखें और सुविधा प्रवेश द्वार पर क्यूआर कोड स्कैन करें।",
+    "qr_notice": "सत्यापन के लिए स्कैन करें"
+  },
+  "excel": {
+    "name_required": "नाम आवश्यक है",
+    "phone_required": "फ़ोन नंबर आवश्यक है",
+    "invalid_phone": "फ़ोन नंबर अमान्य है",
+    "apartment_required": "अपार्टमेंट आवश्यक है",
+    "row_validation_failed": "पंक्ति {{row}}: {{reason}}"
+  }
+}

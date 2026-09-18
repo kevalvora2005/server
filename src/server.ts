@@ -5,6 +5,7 @@ import { createServer } from "http";
 import app from "./app";
 import { env } from "./shared/config/env";
 import { connectDB, sequelize } from "./shared/config/db";
+import "./shared/config/i18n";
 import { initSocket } from "./shared/socket/socket.server";
 import { initScheduledJobs } from "./shared/jobs/scheduler";
 

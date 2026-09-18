@@ -67,6 +67,8 @@ export const jwtMiddleware = async (
       email: user.email,
       role: roleFromGroup || user.role,
       mustResetPassword: user.mustResetPassword,
+      preferredLanguage: user.preferredLanguage,
+      locale: user.locale,
     };
 
     if (user.mustResetPassword) {

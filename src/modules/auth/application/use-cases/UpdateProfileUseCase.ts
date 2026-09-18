@@ -14,6 +14,9 @@ export class UpdateProfileUseCase {
 
     user.updateName(dto.name);
     user.updatePhone(dto.phone);
+    if (dto.preferredLanguage || dto.locale) {
+      user.updateLanguageAndLocale(dto.preferredLanguage, dto.locale);
+    }
 
     await this.userRepository.update(user);
   }

@@ -1,0 +1,73 @@
+{
+  "email": {
+    "welcome_subject": "Welcome to Civic Horizon - Your Account Credentials",
+    "welcome_greeting": "Hello {{name}},",
+    "welcome_body": "Your resident account for Apartment {{apartment}} has been created.",
+    "welcome_temp_pass": "Your temporary password is:",
+    "welcome_login_cta": "Please log in and change your password immediately.",
+    "password_reset_subject": "Password Reset Verification Code",
+    "password_reset_greeting": "Hello {{name}},",
+    "password_reset_code": "Your password reset verification code is: {{code}}",
+    "password_reset_expiry": "This code will expire in {{minutes}} minutes.",
+    "tenancy_approved_subject": "Tenancy Request Approved",
+    "tenancy_rejected_subject": "Tenancy Request Rejected",
+    "tenancy_revoked_subject": "Tenancy Terminated"
+  },
+  "notification": {
+    "visitor_gate": "{{name}} is at the gate for {{purpose}}.",
+    "complaint_lodged": "Complaint {{ticketNumber}} lodged: {{title}}.",
+    "complaint_assigned": "Complaint {{ticketNumber}} assigned to technician.",
+    "complaint_resolved": "Complaint {{ticketNumber}} has been resolved.",
+    "maintenance_overdue": "Maintenance dues of {{amount}} for {{month}} are overdue.",
+    "payment_receipt": "Payment of {{amount}} received for invoice {{invoiceNumber}}.",
+    "booking_requested": "{{amenityName}} was requested by a resident for {{date}}.",
+    "booking_confirmed": "Your booking for {{amenityName}} on {{date}} is confirmed.",
+    "booking_rejected": "Your booking for {{amenityName}} was rejected."
+  },
+  "invoice": {
+    "title": "Maintenance Invoice",
+    "invoice_number": "Invoice #",
+    "date": "Date",
+    "due_date": "Due Date",
+    "bill_to": "Bill To",
+    "apartment": "Apartment",
+    "description": "Description",
+    "amount": "Amount",
+    "subtotal": "Subtotal",
+    "extra_charges": "Extra Charges",
+    "tax": "Tax",
+    "total": "Total",
+    "status_paid": "PAID",
+    "status_unpaid": "UNPAID",
+    "status_overdue": "OVERDUE",
+    "status_partial": "PARTIAL",
+    "terms": "Terms & Conditions",
+    "terms_text": "Payment is due by the due date. Late charges may apply after the due date.",
+    "payment_methods": {
+      "online": "Online Card Payment",
+      "cheque": "Cheque",
+      "upi": "UPI",
+      "cash": "Cash / Manual"
+    }
+  },
+  "booking": {
+    "pass_title": "Facility Booking Pass",
+    "amenity": "Amenity",
+    "date": "Date",
+    "time_slot": "Time Slot",
+    "status": "Status",
+    "resident": "Resident",
+    "apartment": "Apartment",
+    "amount": "Amount Paid",
+    "rules": "Facility Rules & Guidelines",
+    "rules_text": "Please carry this pass and scan QR code at the facility entrance.",
+    "qr_notice": "Scan for verification"
+  },
+  "excel": {
+    "name_required": "Name is required",
+    "phone_required": "Phone is required",
+    "invalid_phone": "Phone number is invalid",
+    "apartment_required": "Apartment is required",
+    "row_validation_failed": "Row {{row}}: {{reason}}"
+  }
+}

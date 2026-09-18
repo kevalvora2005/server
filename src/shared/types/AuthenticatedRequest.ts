@@ -8,5 +8,7 @@ export interface AuthenticatedRequest extends Request {
     email: string;
     role: UserRole;
     mustResetPassword: boolean;
+    preferredLanguage: string;
+    locale: string;
   };
 }

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../../modules/auth/domain/errors/AuthErrors";
+import { AppError } from "../errors/AppError";
 import { ApiResponse } from "../utils/apiResponse";
 
 export const errorHandler = (
@@ -22,7 +22,7 @@ export const errorHandler = (
   }
 
   if (error instanceof AppError) {
-    res.status(error.statusCode).json(ApiResponse.error(error.message));
+    res.status(error.statusCode).json(ApiResponse.error(error.message, error.errorCode));
     return;
   }
 

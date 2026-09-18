@@ -11,11 +11,13 @@ export class ApiResponse<T = unknown> {
   }
 
   static error(
-    message = "Error"
+    message = "Error",
+    errorCode?: string
   ) {
     return {
       success: false,
       message,
+      errorCode,
       data: null,
     };
   }

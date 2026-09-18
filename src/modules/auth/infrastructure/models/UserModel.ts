@@ -11,6 +11,8 @@ export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAt
   declare role: UserRole;
   declare isActive: CreationOptional<boolean>;
   declare mustResetPassword: CreationOptional<boolean>;
+  declare preferredLanguage: CreationOptional<string>;
+  declare locale: CreationOptional<string>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
 }
@@ -59,6 +61,18 @@ UserModel.init(
       allowNull: false,
       defaultValue: false,
       field: 'must_reset_password',
+    },
+    preferredLanguage: {
+      type: DataTypes.STRING(10),
+      allowNull: false,
+      defaultValue: 'en',
+      field: 'preferred_language',
+    },
+    locale: {
+      type: DataTypes.STRING(10),
+      allowNull: false,
+      defaultValue: 'en-IN',
+      field: 'locale',
     },
     createdAt: {
       type: DataTypes.DATE,

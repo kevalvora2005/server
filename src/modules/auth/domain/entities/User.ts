@@ -13,6 +13,8 @@ export interface UserProps {
   role: UserRole;
   isActive: boolean;
   mustResetPassword: boolean;
+  preferredLanguage?: string;
+  locale?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,12 +27,18 @@ export class User {
   }
 
   public static create(
-    props: Omit<UserProps, 'id' | 'isActive' | 'mustResetPassword' | 'createdAt' | 'updatedAt'> & { mustResetPassword?: boolean }
+    props: Omit<UserProps, 'id' | 'isActive' | 'mustResetPassword' | 'createdAt' | 'updatedAt'> & {
+      mustResetPassword?: boolean;
+      preferredLanguage?: string;
+      locale?: string;
+    }
   ): User {
     return new User({
       ...props,
       isActive: true,
       mustResetPassword: props.mustResetPassword ?? false,
+      preferredLanguage: props.preferredLanguage ?? 'en',
+      locale: props.locale ?? 'en-IN',
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -68,6 +76,14 @@ export class User {
     return this.props.mustResetPassword;
   }
 
+  get preferredLanguage(): string {
+    return this.props.preferredLanguage ?? 'en';
+  }
+
+  get locale(): string {
+    return this.props.locale ?? 'en-IN';
+  }
+
   get createdAt(): Date {
     return this.props.createdAt;
   }
@@ -84,6 +100,12 @@ export class User {
 
   updatePhone(phone: string): void {
     this.props.phone = phone;
+    this.props.updatedAt = new Date();
+  }
+
+  updateLanguageAndLocale(preferredLanguage?: string, locale?: string): void {
+    if (preferredLanguage) this.props.preferredLanguage = preferredLanguage;
+    if (locale) this.props.locale = locale;
     this.props.updatedAt = new Date();
   }
 
@@ -117,6 +139,8 @@ export class User {
       role: this.props.role,
       isActive: this.props.isActive,
       mustResetPassword: this.props.mustResetPassword,
+      preferredLanguage: this.preferredLanguage,
+      locale: this.locale,
       createdAt: this.props.createdAt,
     };
   }

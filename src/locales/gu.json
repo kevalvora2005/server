@@ -1,0 +1,73 @@
+{
+  "email": {
+    "welcome_subject": "સિવિક હોરાઇઝનમાં આપનું સ્વાગત છે - તમારી ખાતા વિગતો",
+    "welcome_greeting": "નમસ્તે {{name}},",
+    "welcome_body": "એપાર્ટમેન્ટ {{apartment}} માટે તમારું રહેવાસી ખાતું બનાવવામાં આવ્યું છે.",
+    "welcome_temp_pass": "તમારો કામચલાઉ પાસવર્ડ છે:",
+    "welcome_login_cta": "કૃપા કરીને લૉગ ઇન કરો અને તરત જ તમારો પાસવર્ડ બદલો.",
+    "password_reset_subject": "પાસવર્ડ રીસેટ ચકાસણી કોડ",
+    "password_reset_greeting": "નમસ્તે {{name}},",
+    "password_reset_code": "તમારો પાસવર્ડ રીસેટ ચકાસણી કોડ છે: {{code}}",
+    "password_reset_expiry": "આ કોડ {{minutes}} મિનિટમાં સમાપ્ત થઈ જશે.",
+    "tenancy_approved_subject": "ભાડૂઆત વિનંતી મંજૂર કરવામાં આવી",
+    "tenancy_rejected_subject": "ભાડૂઆત વિનંતી નકારવામાં આવી",
+    "tenancy_revoked_subject": "ભાડૂઆત સમાપ્ત કરવામાં આવી"
+  },
+  "notification": {
+    "visitor_gate": "{{name}} {{purpose}} માટે મુખ્ય દરવાજે છે.",
+    "complaint_lodged": "ફરિયાદ {{ticketNumber}} નોંધાઈ: {{title}}.",
+    "complaint_assigned": "ફરિયાદ {{ticketNumber}} ટેકનિશિયનને સોંપવામાં આવી.",
+    "complaint_resolved": "ફરિયાદ {{ticketNumber}} નો ઉકેલ આવ્યો છે.",
+    "maintenance_overdue": "{{month}} માટે {{amount}} નું મેન્ટેનન્સ બાકી મુદત વીતી ગઈ છે.",
+    "payment_receipt": "ઇનવોઇસ {{invoiceNumber}} માટે {{amount}} ની ચુકવણી પ્રાપ્ત થઈ છે.",
+    "booking_requested": "રહેવાસી દ્વારા {{date}} માટે {{amenityName}} ની વિનંતી કરવામાં આવી હતી.",
+    "booking_confirmed": "{{date}} ના રોજ {{amenityName}} માટે તમારું બુકિંગ કન્ફર્મ થયું છે.",
+    "booking_rejected": "{{amenityName}} માટે તમારું બુકિંગ નકારવામાં આવ્યું હતું."
+  },
+  "invoice": {
+    "title": "મેન્ટેનન્સ ઇનવોઇસ",
+    "invoice_number": "ઇનવોઇસ નંબર",
+    "date": "તારીખ",
+    "due_date": "ચુકવણી તારીખ",
+    "bill_to": "બિલ પ્રાપ્તકર્તા",
+    "apartment": "એપાર્ટમેન્ટ",
+    "description": "વિગત",
+    "amount": "રકમ",
+    "subtotal": "પેટા-કુલ",
+    "extra_charges": "વધારાના શુલ્ક",
+    "tax": "કર",
+    "total": "કુલ રકમ",
+    "status_paid": "ચૂકવેલ",
+    "status_unpaid": "બાકી",
+    "status_overdue": "મુદત વીતી ગયેલ",
+    "status_partial": "આંશિક ચૂકવેલ",
+    "terms": "નિયમો અને શરતો",
+    "terms_text": "ચુકવણી નિયત તારીખ સુધીમાં થવી જોઈએ. નિયત તારીખ પછી વિલંબ શુલ્ક લાગુ થઈ શકે છે.",
+    "payment_methods": {
+      "online": "ઓનલાઇન કાર્ડ ચુકવણી",
+      "cheque": "ચેક",
+      "upi": "યુપીઆઈ",
+      "cash": "રોકડ / મેન્યુઅલ"
+    }
+  },
+  "booking": {
+    "pass_title": "સુવિધા બુકિંગ પાસ",
+    "amenity": "સુવિધા",
+    "date": "તારીખ",
+    "time_slot": "સમય સ્લોટ",
+    "status": "સ્થિતિ",
+    "resident": "રહેવાસી",
+    "apartment": "એપાર્ટમેન્ટ",
+    "amount": "ચૂકવેલ રકમ",
+    "rules": "સુવિધા નિયમો અને માર્ગદર્શિકા",
+    "rules_text": "કૃપા કરીને આ પાસ સાથે રાખો અને સુવિધા પ્રવેશદ્વાર પર ક્યૂઆર કોડ સ્કેન કરો.",
+    "qr_notice": "ચકાસણી માટે સ્કેન કરો"
+  },
+  "excel": {
+    "name_required": "નામ જરૂરી છે",
+    "phone_required": "ફોન નંબર જરૂરી છે",
+    "invalid_phone": "ફોન નંબર અમાન્ય છે",
+    "apartment_required": "એપાર્ટમેન્ટ જરૂરી છે",
+    "row_validation_failed": "પંક્તિ {{row}}: {{reason}}"
+  }
+}
