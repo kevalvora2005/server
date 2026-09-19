@@ -1,4 +1,4 @@
-import i18n from "i18next";
+import i18n, { type TOptions } from "i18next";
 import en from "../../locales/en.json";
 import hi from "../../locales/hi.json";
 import gu from "../../locales/gu.json";
@@ -17,7 +17,7 @@ i18n.init({
   },
 });
 
-export const t = (key: string, options: Record<string, any> = {}) => {
+export const t = (key: string, options: TOptions = {}) => {
   const { lng = "en", ...rest } = options;
   return i18n.t(key, { ...rest, lng });
 };
