@@ -27,7 +27,7 @@ export function buildInvoicePdfTemplate(options: BuildInvoicePdfTemplateOptions)
     options.locale ||
     residentUser?.locale ||
     (rawUser?.get && typeof rawUser.get === "function" ? rawUser.get("locale") : undefined) ||
-    (lng === "gu" ? "gu-IN" : lng === "hi" ? "hi-IN" : "en-IN");
+    "en-IN";
 
   const t = (key: string, opts: Record<string, any> = {}) =>
     i18nT(key, { lng, ...opts });

@@ -20,7 +20,7 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
   const loc =
     options.locale ||
     booking.resident?.locale ||
-    (lng === "gu" ? "gu-IN" : lng === "hi" ? "hi-IN" : "en-IN");
+    "en-IN";
 
   const t = (key: string, opts: Record<string, any> = {}) =>
     i18nT(key, { lng, ...opts });
