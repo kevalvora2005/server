@@ -71,7 +71,10 @@ export const jwtMiddleware = async (
       locale: user.locale,
     };
 
-    (req as AuthenticatedRequest).language = user.preferredLanguage || "en";
+    (req as AuthenticatedRequest).language =
+      (req.language && ["en", "gu", "hi"].includes(req.language))
+        ? req.language
+        : user.preferredLanguage || "en";
 
     if (user.mustResetPassword) {
       res.status(403).json(

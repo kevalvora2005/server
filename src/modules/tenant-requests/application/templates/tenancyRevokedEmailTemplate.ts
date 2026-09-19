@@ -13,18 +13,19 @@ export function buildTenancyRevokedEmailTemplate(options: TenancyRevokedEmailTem
   html: string;
 } {
   const societyName = options.societyName || process.env.SOCIETY_NAME || "Civic Horizon";
+  const lng = options.preferredLanguage || "en";
 
-  const subject = t("email.tenancy_revoked_subject", { societyName });
+  const subject = t("email.tenancy_revoked_subject", { societyName, lng });
 
-  const header = t("email.tenancy_revoked_header");
+  const header = t("email.tenancy_revoked_header", { lng });
 
-  const greeting = t("email.welcome_greeting", { name: options.name });
+  const greeting = t("email.welcome_greeting", { name: options.name, lng });
 
-  const body = t("email.tenancy_revoked_body", { unitName: options.unitName, societyName });
+  const body = t("email.tenancy_revoked_body", { unitName: options.unitName, societyName, lng });
 
-  const note = t("email.tenancy_revoked_deactivated", { societyName });
+  const note = t("email.tenancy_revoked_deactivated", { societyName, lng });
 
-  const footer = t("email.welcome_footer");
+  const footer = t("email.welcome_footer", { lng });
 
   return {
     subject,

@@ -191,11 +191,16 @@ export class MaintenanceController {
     try {
       const authReq = req as AuthenticatedRequest;
       const requestingUser = await this.buildRequestingUser(authReq);
+      const targetLang =
+        (typeof req.query.lng === "string" ? req.query.lng : "") ||
+        authReq.language ||
+        authReq.user?.preferredLanguage;
 
       const invoice = await this.markInvoiceSettledUseCase.execute(
         Number(req.params.id),
         req.body.paymentRef,
         requestingUser,
+        targetLang,
       );
 
       res.status(200).json(
@@ -208,7 +213,12 @@ export class MaintenanceController {
 
   regenerateReceipt = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const pdfUrl = await this.generateInvoicePdfUseCase.execute(Number(req.params.id));
+      const authReq = req as AuthenticatedRequest;
+      const targetLang =
+        (typeof req.query.lng === "string" ? req.query.lng : "") ||
+        authReq.language ||
+        authReq.user?.preferredLanguage;
+      const pdfUrl = await this.generateInvoicePdfUseCase.execute(Number(req.params.id), targetLang);
 
       res.status(200).json(
         ApiResponse.success({ pdfUrl }, "Receipt regenerated successfully")
@@ -223,16 +233,20 @@ export class MaintenanceController {
       const authReq = req as AuthenticatedRequest;
       const requestingUser = await this.buildRequestingUser(authReq);
 
-      const invoice = await this.getInvoiceUseCase.execute(Number(req.params.id), requestingUser);
+      const targetLang =
+        (typeof req.query.lng === "string" ? req.query.lng : "") ||
+        authReq.language ||
+        authReq.user?.preferredLanguage;
+      const pdfUrl = await this.generateInvoicePdfUseCase.execute(Number(req.params.id), targetLang);
 
-      if (!invoice.pdfUrl) {
+      if (!pdfUrl) {
         res.status(404).json(ApiResponse.error("Receipt not found"));
         return;
       }
 
-      const cloudUrl = invoice.pdfUrl.includes("fl_attachment")
-        ? invoice.pdfUrl.replace("fl_attachment/", "")
-        : invoice.pdfUrl;
+      const cloudUrl = pdfUrl.includes("fl_attachment")
+        ? pdfUrl.replace("fl_attachment/", "")
+        : pdfUrl;
 
       let response = await fetch(cloudUrl);
 
@@ -265,7 +279,7 @@ export class MaintenanceController {
       }
 
       const pdfBuffer = Buffer.from(await response.arrayBuffer());
-      const filename = `invoice-${invoice.id}.pdf`;
+      const filename = `invoice-${req.params.id}.pdf`;
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
       res.send(pdfBuffer);

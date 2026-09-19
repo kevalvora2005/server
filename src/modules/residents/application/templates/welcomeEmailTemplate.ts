@@ -17,26 +17,27 @@ export function buildWelcomeEmailTemplate(options: WelcomeEmailTemplateOptions):
 } {
   const societyName = options.societyName || process.env.SOCIETY_NAME || "Civic Horizon";
   const clientUrl = options.clientUrl || process.env.CLIENT_URL || "http://localhost:5173";
+  const lng = options.preferredLanguage || "en";
 
-  const subject = t("email.welcome_subject", { societyName });
+  const subject = t("email.welcome_subject", { societyName, lng });
 
-  const header = t("email.welcome_header", { societyName });
+  const header = t("email.welcome_header", { societyName, lng });
 
-  const greeting = t("email.welcome_greeting", { name: options.name });
+  const greeting = t("email.welcome_greeting", { name: options.name, lng });
 
-  const body = t("email.welcome_body", { unitName: options.unitName, societyName });
+  const body = t("email.welcome_body", { unitName: options.unitName, societyName, lng });
 
-  const credentialsTitle = t("email.welcome_credentials_title");
+  const credentialsTitle = t("email.welcome_credentials_title", { lng });
 
-  const emailLabel = t("email.welcome_email_label");
+  const emailLabel = t("email.welcome_email_label", { lng });
 
-  const tempPassLabel = t("email.welcome_temp_pass");
+  const tempPassLabel = t("email.welcome_temp_pass", { lng });
 
-  const firstLoginNote = t("email.welcome_first_login_note");
+  const firstLoginNote = t("email.welcome_first_login_note", { lng });
 
-  const loginCta = t("email.welcome_login_cta");
+  const loginCta = t("email.welcome_login_cta", { lng });
 
-  const footer = t("email.welcome_footer");
+  const footer = t("email.welcome_footer", { lng });
 
   return {
     subject,

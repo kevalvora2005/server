@@ -4,8 +4,8 @@ import { Resident } from "../../../residents/domain/entities/Resident";
 import { buildInvoicePdfTemplate } from "../../application/templates/invoicePdfTemplate";
 
 export class InvoicePdfService {
-  async generateAndUpload(invoice: Invoice, resident: Resident | null): Promise<string> {
-    const html = buildInvoicePdfTemplate({ invoice, resident });
+  async generateAndUpload(invoice: Invoice, resident: Resident | null, language?: string, locale?: string): Promise<string> {
+    const html = buildInvoicePdfTemplate({ invoice, resident, language, locale });
 
     let browser;
     try {
@@ -44,6 +44,8 @@ export class InvoicePdfService {
           public_id: `invoice-${invoiceId}`,
           resource_type: "raw",
           type: "upload",
+          overwrite: true,
+          invalidate: true,
         },
         (error, result) => {
           if (error || !result) return reject(error);

@@ -1,4 +1,4 @@
-import { t } from "../../../../shared/config/i18n";
+import { t as i18nT } from "../../../../shared/config/i18n";
 import { Invoice } from "../../domain/entities/Invoice";
 import { Resident } from "../../../residents/domain/entities/Resident";
 import { env } from "../../../../shared/config/env";
@@ -7,14 +7,30 @@ import { consolidateLateFeesForDisplay } from "../../domain/services/PenaltyCalc
 export interface BuildInvoicePdfTemplateOptions {
   invoice: Invoice;
   resident: Resident | null;
+  language?: string;
+  locale?: string;
 }
 
 export function buildInvoicePdfTemplate(options: BuildInvoicePdfTemplateOptions): string {
   const { invoice, resident } = options;
-  const residentUser = resident?.user as { name?: string; email?: string; preferredLanguage?: string; locale?: string } | undefined;
-  const residentApartment = resident?.apartment as { block?: string; floorNumber?: number; unitNumber?: string } | undefined;
+  const rawUser = (resident?.user as any)?.dataValues || resident?.user;
+  const residentUser = rawUser as { name?: string; email?: string; preferredLanguage?: string; locale?: string } | undefined;
+  const rawApartment = (resident?.apartment as any)?.dataValues || resident?.apartment;
+  const residentApartment = rawApartment as { block?: string; floorNumber?: number; unitNumber?: string } | undefined;
 
-  const loc = residentUser?.locale || "en-IN";
+  const lng =
+    options.language ||
+    residentUser?.preferredLanguage ||
+    (rawUser?.get && typeof rawUser.get === "function" ? rawUser.get("preferredLanguage") : undefined) ||
+    "en";
+  const loc =
+    options.locale ||
+    residentUser?.locale ||
+    (rawUser?.get && typeof rawUser.get === "function" ? rawUser.get("locale") : undefined) ||
+    (lng === "gu" ? "gu-IN" : lng === "hi" ? "hi-IN" : "en-IN");
+
+  const t = (key: string, opts: Record<string, any> = {}) =>
+    i18nT(key, { lng, ...opts });
 
   const monthName = new Date(invoice.year, invoice.month - 1).toLocaleString(loc, { month: "long" });
   const paidDate = invoice.paidAt
@@ -48,17 +64,34 @@ export function buildInvoicePdfTemplate(options: BuildInvoicePdfTemplateOptions)
 
   const displayCharges = consolidateLateFeesForDisplay(invoice.extraCharges);
   const extraChargesRows = displayCharges
-    .map(
-      (c) => `
+    .map((c) => {
+      const localizedLabel = c.label.toLowerCase().startsWith("late fee")
+        ? c.label.replace(/^late fee/i, t("invoice.late_fee", { defaultValue: "Late fee" }))
+        : c.label;
+      return `
         <tr>
-          <td>${c.label}</td>
+          <td>${localizedLabel}</td>
           <td class="amt">₹${c.amount.toFixed(2)}</td>
-        </tr>`
-    )
+        </tr>`;
+    })
     .join("");
 
-  const societyName = env.SOCIETY_NAME || "Civic Horizon";
-  const societyAddress = env.SOCIETY_ADDRESS || "";
+  const societyName = t("society.name", {
+    defaultValue: t("invoice.society_name", {
+      defaultValue:
+        env.SOCIETY_NAME && env.SOCIETY_NAME !== "My Society"
+          ? env.SOCIETY_NAME
+          : "Civic Horizon Society",
+    }),
+  });
+  const societyAddress = t("society.address", {
+    defaultValue: t("invoice.society_address", {
+      defaultValue:
+        env.SOCIETY_ADDRESS && env.SOCIETY_ADDRESS !== "123 Main St, City, Country"
+          ? env.SOCIETY_ADDRESS
+          : "Civic Horizon Society, Near SOBO Center, South Bopal, Ahmedabad, Gujarat - 380058.",
+    }),
+  });
 
   return `
     <!DOCTYPE html>
@@ -67,7 +100,7 @@ export function buildInvoicePdfTemplate(options: BuildInvoicePdfTemplateOptions)
       <meta charset="utf-8" />
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1f2937; font-size: 12px; line-height: 1.5; }
+        body { font-family: 'Nirmala UI', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1f2937; font-size: 12px; line-height: 1.5; }
 
         .page { width: 100%; min-height: 100vh; background: #f8fafc; padding: 30px 40px; }
         .card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.08); overflow: hidden; }
@@ -123,10 +156,10 @@ export function buildInvoicePdfTemplate(options: BuildInvoicePdfTemplateOptions)
           <div class="top-bar">
             <div class="left">
               <h1>${societyName}</h1>
-              <p>${t("invoice.title", )}</p>
+              <p>${t("invoice.title")}</p>
             </div>
             <div class="right">
-              <div class="badge-paid">${t("invoice.status_paid", )}</div>
+              <div class="badge-paid">${t("invoice.status_paid")}</div>
             </div>
           </div>
 
@@ -138,15 +171,15 @@ export function buildInvoicePdfTemplate(options: BuildInvoicePdfTemplateOptions)
             <!-- Meta -->
             <div class="meta-grid">
               <div class="meta-col">
-                <div class="meta-label">${t("invoice.invoice_number", )}</div>
+                <div class="meta-label">${t("invoice.invoice_number")}</div>
                 <div class="meta-value">#${String(invoice.id).padStart(4, "0")}</div>
               </div>
               <div class="meta-col">
-                <div class="meta-label">${t("invoice.date", )}</div>
+                <div class="meta-label">${t("invoice.date")}</div>
                 <div class="meta-value">${paidDate}</div>
               </div>
               <div class="meta-col">
-                <div class="meta-label">${t("invoice.due_date", )}</div>
+                <div class="meta-label">${t("invoice.due_date")}</div>
                 <div class="meta-value">${monthName} ${invoice.year}</div>
               </div>
             </div>
@@ -154,35 +187,35 @@ export function buildInvoicePdfTemplate(options: BuildInvoicePdfTemplateOptions)
             <div class="meta-divider"></div>
 
             <!-- Billed to -->
-            <div class="section-title">${t("invoice.bill_to", )}</div>
+            <div class="section-title">${t("invoice.bill_to")}</div>
             <div class="meta-grid" style="margin-bottom: 18px;">
               <div class="meta-col">
                 <div class="meta-value">${residentUser?.name ?? "Resident"}</div>
                 <div class="meta-sub">${residentUser?.email ?? ""}</div>
               </div>
               <div class="meta-col">
-                <div class="meta-value">${t("invoice.apartment", )} ${aptLabel}</div>
-                <div class="meta-sub">${residentApartment?.floorNumber ? `Floor ${residentApartment.floorNumber}` : ""}</div>
+                <div class="meta-value">${t("invoice.apartment")} ${aptLabel}</div>
+                <div class="meta-sub">${residentApartment?.floorNumber ? `${t("invoice.floor", { defaultValue: "Floor" })} ${residentApartment.floorNumber}` : ""}</div>
               </div>
             </div>
 
             <!-- Charges -->
-            <div class="section-title">${t("invoice.description", )}</div>
+            <div class="section-title">${t("invoice.description")}</div>
             <table class="invoice-table">
               <thead>
                 <tr>
-                  <th style="width:75%">${t("invoice.description", )}</th>
-                  <th style="width:25%" class="amt">${t("invoice.amount", )}</th>
+                  <th style="width:75%">${t("invoice.description")}</th>
+                  <th style="width:25%" class="amt">${t("invoice.amount")}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>${t("invoice.title", )} — ${monthName} ${invoice.year}</td>
+                  <td>${t("invoice.title")} — ${monthName} ${invoice.year}</td>
                   <td class="amt">₹${invoice.baseAmount.toFixed(2)}</td>
                 </tr>
                 ${extraChargesRows}
                 <tr class="total-row">
-                  <td>${t("invoice.total", )}</td>
+                  <td>${t("invoice.total")}</td>
                   <td class="amt">₹${invoice.totalAmount.toFixed(2)}</td>
                 </tr>
               </tbody>
@@ -191,26 +224,26 @@ export function buildInvoicePdfTemplate(options: BuildInvoicePdfTemplateOptions)
             <!-- Payment -->
             <div class="payment-box">
               <div class="row">
-                <span class="label">${t("invoice.payment_reference", )}</span>
+                <span class="label">${t("invoice.payment_reference")}</span>
                 <span class="value">${paymentReference ?? "—"}</span>
               </div>
               <div class="row" style="margin-top:4px;">
-                <span class="label">${t("invoice.payment_method", )}</span>
+                <span class="label">${t("invoice.payment_method")}</span>
                 <span class="value">${paymentMethod}</span>
               </div>
             </div>
 
             <!-- Terms -->
             <div class="terms-box">
-              <div class="title">${t("invoice.terms", )}</div>
-              <div class="desc">${t("invoice.terms_text", )}</div>
+              <div class="title">${t("invoice.terms")}</div>
+              <div class="desc">${t("invoice.terms_text")}</div>
             </div>
 
           </div>
 
           <!-- ─── FOOTER ─── -->
           <div class="footer">
-            <strong>${societyName}</strong> &mdash; ${t("invoice.footer_notice", )}
+            <strong>${societyName}</strong> &mdash; ${t("invoice.footer_notice")}
           </div>
 
         </div>

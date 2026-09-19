@@ -1,4 +1,4 @@
-import { t } from "../../../../shared/config/i18n";
+import { t as i18nT } from "../../../../shared/config/i18n";
 import { Booking } from "../../domain/entities/Booking";
 import { Amenity } from "../../domain/entities/Amenity";
 import { env } from "../../../../shared/config/env";
@@ -6,12 +6,24 @@ import { env } from "../../../../shared/config/env";
 export interface BuildBookingPdfTemplateOptions {
   booking: Booking;
   amenity: Amenity | null;
+  language?: string;
+  locale?: string;
 }
 
 export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions): string {
   const { booking, amenity } = options;
 
-  const loc = booking.resident?.locale || "en-IN";
+  const lng =
+    options.language ||
+    booking.resident?.preferredLanguage ||
+    "en";
+  const loc =
+    options.locale ||
+    booking.resident?.locale ||
+    (lng === "gu" ? "gu-IN" : lng === "hi" ? "hi-IN" : "en-IN");
+
+  const t = (key: string, opts: Record<string, any> = {}) =>
+    i18nT(key, { lng, ...opts });
 
   const paidDate = booking.paidAt
     ? new Date(booking.paidAt).toLocaleDateString(loc, {
@@ -31,7 +43,10 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
       ? `${booking.apartment.block}-${booking.apartment.floorNumber}${booking.apartment.unitNumber}`
       : `Apt #${booking.apartmentId}`);
 
-  const amenityName = amenity?.name || `Amenity #${booking.amenityId}`;
+  const rawAmenityName = amenity?.name || `Amenity #${booking.amenityId}`;
+  const amenityName = t(`amenity_names.${rawAmenityName}`, {
+    defaultValue: rawAmenityName,
+  });
   const amenityPrice = amenity?.price ?? 0;
   const formattedPrice = new Intl.NumberFormat(loc, {
     style: "currency",
@@ -77,8 +92,22 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
   });
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${encodeURIComponent(verificationPayload)}`;
 
-  const societyName = env.SOCIETY_NAME || "Civic Horizon";
-  const societyAddress = env.SOCIETY_ADDRESS || "";
+  const societyName = t("society.name", {
+    defaultValue: t("booking.society_name", {
+      defaultValue:
+        env.SOCIETY_NAME && env.SOCIETY_NAME !== "My Society"
+          ? env.SOCIETY_NAME
+          : "Civic Horizon Society",
+    }),
+  });
+  const societyAddress = t("society.address", {
+    defaultValue: t("booking.society_address", {
+      defaultValue:
+        env.SOCIETY_ADDRESS && env.SOCIETY_ADDRESS !== "123 Main St, City, Country"
+          ? env.SOCIETY_ADDRESS
+          : "Civic Horizon Society, Near SOBO Center, South Bopal, Ahmedabad, Gujarat - 380058.",
+    }),
+  });
 
   return `
     <!DOCTYPE html>
@@ -87,7 +116,7 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
       <meta charset="utf-8" />
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1f2937; font-size: 12px; line-height: 1.5; }
+        body { font-family: 'Nirmala UI', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1f2937; font-size: 12px; line-height: 1.5; }
 
         .page { width: 100%; min-height: 100vh; background: #f8fafc; padding: 30px 40px; }
         .card { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.08); overflow: hidden; }

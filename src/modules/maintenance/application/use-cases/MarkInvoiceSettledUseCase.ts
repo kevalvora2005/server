@@ -18,7 +18,7 @@ export class MarkInvoiceSettledUseCase {
     private readonly maintenanceNotifier: IMaintenanceNotifier,
   ) {}
 
-  async execute(invoiceId: number, paymentRef?: string, requestingUser?: RequestingUser): Promise<Invoice> {
+  async execute(invoiceId: number, paymentRef?: string, requestingUser?: RequestingUser, preferredLanguage?: string): Promise<Invoice> {
     const invoice = await this.invoiceRepository.findById(invoiceId);
 
     if (!invoice) {
@@ -48,7 +48,7 @@ export class MarkInvoiceSettledUseCase {
     const updatedInvoice = await this.invoiceRepository.update(invoice);
 
     try {
-      const pdfUrl = await this.generateInvoicePdfUseCase.execute(invoice.id!);
+      const pdfUrl = await this.generateInvoicePdfUseCase.execute(invoice.id!, preferredLanguage);
       updatedInvoice.setPdfUrl(pdfUrl);
     } catch (error) {
       console.error("Failed to generate invoice PDF during settlement:", error);

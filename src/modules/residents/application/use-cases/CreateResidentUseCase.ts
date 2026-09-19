@@ -99,6 +99,7 @@ export class CreateResidentUseCase {
         email: dto.email,
         unitName,
         temporaryPassword: rawPassword,
+        preferredLanguage: dto.preferredLanguage,
       });
 
       this.emailService.sendEmail({

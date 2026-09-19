@@ -4,8 +4,13 @@ import { Amenity } from "../../domain/entities/Amenity";
 import { buildBookingPdfTemplate } from "../../application/templates/bookingPdfTemplate";
 
 export class BookingPdfService {
-  async generateAndUpload(booking: Booking, amenity: Amenity | null): Promise<string> {
-    const html = buildBookingPdfTemplate({ booking, amenity });
+  async generateAndUpload(
+    booking: Booking,
+    amenity: Amenity | null,
+    language?: string,
+    locale?: string
+  ): Promise<string> {
+    const html = buildBookingPdfTemplate({ booking, amenity, language, locale });
 
     let browser;
     try {
@@ -44,6 +49,8 @@ export class BookingPdfService {
           public_id: `booking-receipt-${bookingId}`,
           resource_type: "raw",
           type: "upload",
+          overwrite: true,
+          invalidate: true,
         },
         (error, result) => {
           if (error || !result) return reject(error);

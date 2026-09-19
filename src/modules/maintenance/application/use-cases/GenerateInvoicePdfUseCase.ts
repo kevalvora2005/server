@@ -10,18 +10,29 @@ export class GenerateInvoicePdfUseCase {
     private readonly residentRepository: IResidentRepository,
   ) { }
 
-  async execute(invoiceId: number): Promise<string> {
+  async execute(invoiceId: number, preferredLanguage?: string): Promise<string> {
     const invoice = await this.invoiceRepository.findById(invoiceId);
 
     if (!invoice) {
       throw new InvoiceNotFoundError(invoiceId);
     }
 
-    const resident = invoice.residentId
+    let resident = invoice.residentId
       ? await this.residentRepository.findById(invoice.residentId)
       : null;
 
-    const pdfUrl = await this.invoicePdfService.generateAndUpload(invoice, resident);
+    if (!resident && invoice.apartmentId) {
+      const aptResident =
+        (await this.residentRepository.findActiveTenantByApartmentId(invoice.apartmentId)) ||
+        (await this.residentRepository.findOccupantByApartmentId(invoice.apartmentId)) ||
+        (await this.residentRepository.findOwnerByApartmentId(invoice.apartmentId));
+
+      if (aptResident?.id) {
+        resident = await this.residentRepository.findById(aptResident.id);
+      }
+    }
+
+    const pdfUrl = await this.invoicePdfService.generateAndUpload(invoice, resident, preferredLanguage);
 
     invoice.setPdfUrl(pdfUrl);
     await this.invoiceRepository.update(invoice);

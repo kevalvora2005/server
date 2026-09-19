@@ -5,4 +5,5 @@ export interface CreateResidentDto {
   password?: string;
   apartmentId: number;
   isOwner?: boolean;
+  preferredLanguage?: string;
 }

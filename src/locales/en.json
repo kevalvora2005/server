@@ -76,6 +76,10 @@
     "payment_reference": "Payment Reference",
     "payment_method": "Payment Method",
     "footer_notice": "This is a computer-generated receipt and does not require a physical signature.",
+    "society_name": "Civic Horizon Society",
+    "society_address": "Civic Horizon Society, Near SOBO Center, South Bopal, Ahmedabad, Gujarat - 380058.",
+    "floor": "Floor",
+    "late_fee": "Late fee",
     "payment_methods": {
       "online": "Online Card Payment",
       "cheque": "Cheque",
@@ -112,7 +116,9 @@
     "rules": "Facility Rules & Guidelines",
     "rules_text": "Please carry this pass and scan QR code at the facility entrance.",
     "qr_notice": "Scan for verification",
-    "footer_notice": "This is a computer-generated booking receipt and does not require a physical signature."
+    "footer_notice": "This is a computer-generated booking receipt and does not require a physical signature.",
+    "society_name": "Civic Horizon Society",
+    "society_address": "Civic Horizon Society, Near SOBO Center, South Bopal, Ahmedabad, Gujarat - 380058."
   },
   "excel": {
     "name_required": "Name is required",
@@ -120,5 +126,17 @@
     "invalid_phone": "Phone number is invalid",
     "apartment_required": "Apartment is required",
     "row_validation_failed": "Row {{row}}: {{reason}}"
+  },
+  "society": {
+    "name": "Civic Horizon Society",
+    "address": "Civic Horizon Society, Near SOBO Center, South Bopal, Ahmedabad, Gujarat - 380058."
+  },
+  "amenity_names": {
+    "Clubhouse Banquet Hall": "Clubhouse Banquet Hall",
+    "Yoga & Meditation Studio": "Yoga & Meditation Studio",
+    "Tennis Court": "Tennis Court",
+    "Badminton Court": "Badminton Court",
+    "Community Rooftop BBQ Lounge": "Community Rooftop BBQ Lounge",
+    "Squash Court": "Squash Court"
   }
 }

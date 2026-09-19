@@ -13,7 +13,11 @@ export class GenerateBookingReceiptUseCase {
     private readonly bookingPdfService: BookingPdfService
   ) {}
 
-  async execute(bookingId: number, requestingUser?: RequestingUser): Promise<string> {
+  async execute(
+    bookingId: number,
+    requestingUser?: RequestingUser,
+    preferredLanguage?: string
+  ): Promise<string> {
     const booking = await this.bookingRepository.findById(bookingId);
     if (!booking) {
       throw new BookingNotFoundError();
@@ -29,12 +33,17 @@ export class GenerateBookingReceiptUseCase {
       }
     }
 
-    if (booking.receiptUrl) {
-      return booking.receiptUrl;
-    }
+    const targetLang =
+      preferredLanguage ||
+      booking.resident?.preferredLanguage ||
+      "en";
 
     const amenity = await this.amenityRepository.findById(booking.amenityId);
-    const pdfUrl = await this.bookingPdfService.generateAndUpload(booking, amenity);
+    const pdfUrl = await this.bookingPdfService.generateAndUpload(
+      booking,
+      amenity,
+      targetLang
+    );
 
     booking.setReceiptUrl(pdfUrl);
     await this.bookingRepository.update(booking);

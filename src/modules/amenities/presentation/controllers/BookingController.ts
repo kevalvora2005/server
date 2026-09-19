@@ -213,10 +213,18 @@ export class BookingController {
 
   getBookingReceipt = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const id = Number(req.params.id);
       const authReq = req as AuthenticatedRequest;
       const requestingUser = await this.buildRequestingUser(authReq);
-      const id = Number(req.params.id);
-      const pdfUrl = await this.generateBookingReceiptUseCase.execute(id, requestingUser);
+      const targetLang =
+        (typeof req.query.lng === "string" ? req.query.lng : "") ||
+        authReq.language ||
+        authReq.user?.preferredLanguage;
+      const pdfUrl = await this.generateBookingReceiptUseCase.execute(
+        id,
+        requestingUser,
+        targetLang
+      );
 
       if (!pdfUrl) {
         res.status(404).json(ApiResponse.error("Booking receipt not found"));
