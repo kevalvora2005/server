@@ -191,10 +191,7 @@ export class MaintenanceController {
     try {
       const authReq = req as AuthenticatedRequest;
       const requestingUser = await this.buildRequestingUser(authReq);
-      const targetLang =
-        (typeof req.query.lng === "string" ? req.query.lng : "") ||
-        authReq.language ||
-        authReq.user?.preferredLanguage;
+      const targetLang = authReq.language;
 
       const invoice = await this.markInvoiceSettledUseCase.execute(
         Number(req.params.id),
@@ -214,10 +211,7 @@ export class MaintenanceController {
   regenerateReceipt = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const authReq = req as AuthenticatedRequest;
-      const targetLang =
-        (typeof req.query.lng === "string" ? req.query.lng : "") ||
-        authReq.language ||
-        authReq.user?.preferredLanguage;
+      const targetLang = authReq.language;
       const pdfUrl = await this.generateInvoicePdfUseCase.execute(Number(req.params.id), targetLang);
 
       res.status(200).json(
@@ -233,10 +227,7 @@ export class MaintenanceController {
       const authReq = req as AuthenticatedRequest;
       const requestingUser = await this.buildRequestingUser(authReq);
 
-      const targetLang =
-        (typeof req.query.lng === "string" ? req.query.lng : "") ||
-        authReq.language ||
-        authReq.user?.preferredLanguage;
+      const targetLang = authReq.language;
       const pdfUrl = await this.generateInvoicePdfUseCase.execute(Number(req.params.id), targetLang);
 
       if (!pdfUrl) {

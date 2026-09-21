@@ -216,10 +216,7 @@ export class BookingController {
       const id = Number(req.params.id);
       const authReq = req as AuthenticatedRequest;
       const requestingUser = await this.buildRequestingUser(authReq);
-      const targetLang =
-        (typeof req.query.lng === "string" ? req.query.lng : "") ||
-        authReq.language ||
-        authReq.user?.preferredLanguage;
+      const targetLang = authReq.language;
       const pdfUrl = await this.generateBookingReceiptUseCase.execute(
         id,
         requestingUser,

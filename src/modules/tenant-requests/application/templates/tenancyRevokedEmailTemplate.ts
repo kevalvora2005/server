@@ -1,4 +1,4 @@
-import { t } from "../../../../shared/config/i18n";
+import i18n from "../../../../shared/config/i18n";
 
 export interface TenancyRevokedEmailTemplateOptions {
   name: string;
@@ -14,18 +14,14 @@ export function buildTenancyRevokedEmailTemplate(options: TenancyRevokedEmailTem
 } {
   const societyName = options.societyName || process.env.SOCIETY_NAME || "Civic Horizon";
   const lng = options.preferredLanguage || "en";
+  const t = (key: string, opts: Record<string, any> = {}) => i18n.t(key, { lng, ...opts });
 
-  const subject = t("email.tenancy_revoked_subject", { societyName, lng });
-
-  const header = t("email.tenancy_revoked_header", { lng });
-
-  const greeting = t("email.welcome_greeting", { name: options.name, lng });
-
-  const body = t("email.tenancy_revoked_body", { unitName: options.unitName, societyName, lng });
-
-  const note = t("email.tenancy_revoked_deactivated", { societyName, lng });
-
-  const footer = t("email.welcome_footer", { lng });
+  const subject  = t("email.tenancy_revoked_subject",     { societyName });
+  const header   = t("email.tenancy_revoked_header");
+  const greeting = t("email.welcome_greeting",            { name: options.name });
+  const body     = t("email.tenancy_revoked_body",        { unitName: options.unitName, societyName });
+  const note     = t("email.tenancy_revoked_deactivated", { societyName });
+  const footer   = t("email.welcome_footer");
 
   return {
     subject,

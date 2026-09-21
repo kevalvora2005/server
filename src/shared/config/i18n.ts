@@ -17,9 +17,5 @@ i18n.init({
   },
 });
 
-export const t = (key: string, options: TOptions = {}) => {
-  const { lng = "en", ...rest } = options;
-  return i18n.t(key, { ...rest, lng });
-};
-
 export default i18n;
+

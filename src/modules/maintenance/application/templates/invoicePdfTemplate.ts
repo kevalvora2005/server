@@ -1,4 +1,4 @@
-import { t as i18nT } from "../../../../shared/config/i18n";
+import i18n from "../../../../shared/config/i18n";
 import { Invoice } from "../../domain/entities/Invoice";
 import { Resident } from "../../../residents/domain/entities/Resident";
 import { env } from "../../../../shared/config/env";
@@ -18,19 +18,11 @@ export function buildInvoicePdfTemplate(options: BuildInvoicePdfTemplateOptions)
   const rawApartment = (resident?.apartment as any)?.dataValues || resident?.apartment;
   const residentApartment = rawApartment as { block?: string; floorNumber?: number; unitNumber?: string } | undefined;
 
-  const lng =
-    options.language ||
-    residentUser?.preferredLanguage ||
-    (rawUser?.get && typeof rawUser.get === "function" ? rawUser.get("preferredLanguage") : undefined) ||
-    "en";
-  const loc =
-    options.locale ||
-    residentUser?.locale ||
-    (rawUser?.get && typeof rawUser.get === "function" ? rawUser.get("locale") : undefined) ||
-    "en-IN";
+  const lng = options.language!;
+  const loc = residentUser?.locale || "en-IN";
 
   const t = (key: string, opts: Record<string, any> = {}) =>
-    i18nT(key, { lng, ...opts });
+    i18n.t(key, { lng, ...opts });
 
   const monthName = new Date(invoice.year, invoice.month - 1).toLocaleString(loc, { month: "long" });
   const paidDate = invoice.paidAt

@@ -1,4 +1,4 @@
-import { t as i18nT } from "../../../../shared/config/i18n";
+import i18n from "../../../../shared/config/i18n";
 import { Booking } from "../../domain/entities/Booking";
 import { Amenity } from "../../domain/entities/Amenity";
 import { env } from "../../../../shared/config/env";
@@ -13,17 +13,11 @@ export interface BuildBookingPdfTemplateOptions {
 export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions): string {
   const { booking, amenity } = options;
 
-  const lng =
-    options.language ||
-    booking.resident?.preferredLanguage ||
-    "en";
-  const loc =
-    options.locale ||
-    booking.resident?.locale ||
-    "en-IN";
+  const lng = options.language!;
+  const loc = booking.resident?.locale || "en-IN"; // safety net only if resident is null
 
   const t = (key: string, opts: Record<string, any> = {}) =>
-    i18nT(key, { lng, ...opts });
+    i18n.t(key, { lng, ...opts });
 
   const paidDate = booking.paidAt
     ? new Date(booking.paidAt).toLocaleDateString(loc, {

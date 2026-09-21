@@ -1,4 +1,4 @@
-import { t } from "../../../../shared/config/i18n";
+import i18n from "../../../../shared/config/i18n";
 
 export interface WelcomeEmailTemplateOptions {
   name: string;
@@ -18,26 +18,18 @@ export function buildWelcomeEmailTemplate(options: WelcomeEmailTemplateOptions):
   const societyName = options.societyName || process.env.SOCIETY_NAME || "Civic Horizon";
   const clientUrl = options.clientUrl || process.env.CLIENT_URL || "http://localhost:5173";
   const lng = options.preferredLanguage || "en";
+  const t = (key: string, opts: Record<string, any> = {}) => i18n.t(key, { lng, ...opts });
 
-  const subject = t("email.welcome_subject", { societyName, lng });
-
-  const header = t("email.welcome_header", { societyName, lng });
-
-  const greeting = t("email.welcome_greeting", { name: options.name, lng });
-
-  const body = t("email.welcome_body", { unitName: options.unitName, societyName, lng });
-
-  const credentialsTitle = t("email.welcome_credentials_title", { lng });
-
-  const emailLabel = t("email.welcome_email_label", { lng });
-
-  const tempPassLabel = t("email.welcome_temp_pass", { lng });
-
-  const firstLoginNote = t("email.welcome_first_login_note", { lng });
-
-  const loginCta = t("email.welcome_login_cta", { lng });
-
-  const footer = t("email.welcome_footer", { lng });
+  const subject          = t("email.welcome_subject",          { societyName });
+  const header           = t("email.welcome_header",           { societyName });
+  const greeting         = t("email.welcome_greeting",         { name: options.name });
+  const body             = t("email.welcome_body",             { unitName: options.unitName, societyName });
+  const credentialsTitle = t("email.welcome_credentials_title");
+  const emailLabel       = t("email.welcome_email_label");
+  const tempPassLabel    = t("email.welcome_temp_pass");
+  const firstLoginNote   = t("email.welcome_first_login_note");
+  const loginCta         = t("email.welcome_login_cta");
+  const footer           = t("email.welcome_footer");
 
   return {
     subject,
