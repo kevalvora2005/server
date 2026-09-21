@@ -20,16 +20,16 @@ export function buildWelcomeEmailTemplate(options: WelcomeEmailTemplateOptions):
   const lng = options.preferredLanguage || "en";
   const t = (key: string, opts: Record<string, any> = {}) => i18n.t(key, { lng, ...opts });
 
-  const subject          = t("email.welcome_subject",          { societyName });
-  const header           = t("email.welcome_header",           { societyName });
-  const greeting         = t("email.welcome_greeting",         { name: options.name });
-  const body             = t("email.welcome_body",             { unitName: options.unitName, societyName });
+  const subject = t("email.welcome_subject", { societyName });
+  const header = t("email.welcome_header", { societyName });
+  const greeting = t("email.welcome_greeting", { name: options.name });
+  const body = t("email.welcome_body", { unitName: options.unitName, societyName });
   const credentialsTitle = t("email.welcome_credentials_title");
-  const emailLabel       = t("email.welcome_email_label");
-  const tempPassLabel    = t("email.welcome_temp_pass");
-  const firstLoginNote   = t("email.welcome_first_login_note");
-  const loginCta         = t("email.welcome_login_cta");
-  const footer           = t("email.welcome_footer");
+  const emailLabel = t("email.welcome_email_label");
+  const tempPassLabel = t("email.welcome_temp_pass");
+  const firstLoginNote = t("email.welcome_first_login_note");
+  const loginCta = t("email.welcome_login_cta");
+  const footer = t("email.welcome_footer");
 
   return {
     subject,

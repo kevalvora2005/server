@@ -16,12 +16,12 @@ export function buildTenancyRevokedEmailTemplate(options: TenancyRevokedEmailTem
   const lng = options.preferredLanguage || "en";
   const t = (key: string, opts: Record<string, any> = {}) => i18n.t(key, { lng, ...opts });
 
-  const subject  = t("email.tenancy_revoked_subject",     { societyName });
-  const header   = t("email.tenancy_revoked_header");
-  const greeting = t("email.welcome_greeting",            { name: options.name });
-  const body     = t("email.tenancy_revoked_body",        { unitName: options.unitName, societyName });
-  const note     = t("email.tenancy_revoked_deactivated", { societyName });
-  const footer   = t("email.welcome_footer");
+  const subject = t("email.tenancy_revoked_subject", { societyName });
+  const header = t("email.tenancy_revoked_header");
+  const greeting = t("email.welcome_greeting", { name: options.name });
+  const body = t("email.tenancy_revoked_body", { unitName: options.unitName, societyName });
+  const note = t("email.tenancy_revoked_deactivated", { societyName });
+  const footer = t("email.welcome_footer");
 
   return {
     subject,
