@@ -1,7 +1,7 @@
 import { TenantRequestRepository } from "./infrastructure/repositories/TenantRequestRepository";
 import { TenantRequestVoteRepository } from "./infrastructure/repositories/TenantRequestVoteRepository";
 import { UserRepository } from "../auth/infrastructure/repositories/UserRepository";
-import { NodemailerEmailService } from "../auth/infrastructure/services/NodemailerEmailService";
+import { SesEmailService } from "../auth/infrastructure/services/SesEmailService";
 import { CognitoAuthService } from "../auth/infrastructure/services/CognitoAuthService";
 
 import { SubmitTenantRequestUseCase } from "./application/use-cases/SubmitTenantRequestUseCase";
@@ -18,7 +18,7 @@ const tenantRequestVoteRepository = new TenantRequestVoteRepository();
 const residentRepository = new ResidentRepository();
 const userRepository = new UserRepository();
 const visitorRepository = new VisitorRepository();
-const emailService = new NodemailerEmailService();
+const emailService = new SesEmailService();
 const cognitoAuthService = new CognitoAuthService();
 
 const submitTenantRequestUseCase = new SubmitTenantRequestUseCase(tenantRequestRepository, residentRepository, userRepository);

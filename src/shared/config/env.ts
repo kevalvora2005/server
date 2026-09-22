@@ -23,24 +23,6 @@ export const env = {
   DATABASE_URL:
     process.env.DATABASE_URL,
 
-  SMTP_HOST:
-    process.env.SMTP_HOST,
-
-  SMTP_PORT:
-    Number(process.env.SMTP_PORT) || 587,
-
-  SMTP_USER:
-    process.env.SMTP_USER,
-
-  SMTP_PASSWORD:
-    process.env.SMTP_PASSWORD,
-
-  SMTP_FROM_NAME:
-    process.env.SMTP_FROM_NAME,
-
-  SMTP_FROM_EMAIL:
-    process.env.SMTP_FROM_EMAIL,
-
   CLOUDINARY_CLOUD_NAME:
     process.env.CLOUDINARY_CLOUD_NAME,
 
@@ -73,5 +55,7 @@ export const env = {
 
   S3_BUCKET_NAME:
     process.env.S3_BUCKET_NAME || "",
-    
+
+  SES_FROM_EMAIL:
+    process.env.SES_FROM_EMAIL || "no-reply@civichorizon.com",
 };

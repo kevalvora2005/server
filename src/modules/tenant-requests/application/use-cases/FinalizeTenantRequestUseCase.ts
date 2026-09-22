@@ -184,7 +184,7 @@ export class FinalizeTenantRequestUseCase {
       }
     }
 
-    const { subject, html } = buildWelcomeEmailTemplate({
+    const { subject, html } = await buildWelcomeEmailTemplate({
       name: request.tenantName,
       email: savedTenantUser.email,
       unitName,

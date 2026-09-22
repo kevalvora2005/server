@@ -94,7 +94,7 @@ export class CreateResidentUseCase {
     }
 
     if (this.emailService && savedUser.id) {
-      const { subject, html } = buildWelcomeEmailTemplate({
+      const { subject, html } = await buildWelcomeEmailTemplate({
         name: dto.name,
         email: dto.email,
         unitName,

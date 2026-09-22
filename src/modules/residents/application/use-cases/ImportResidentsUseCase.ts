@@ -361,7 +361,7 @@ export class ImportResidentsUseCase {
       for (const item of createdResidents) {
         (async () => {
           try {
-            const { subject, html } = buildWelcomeEmailTemplate({
+            const { subject, html } = await buildWelcomeEmailTemplate({
               name: item.name,
               email: item.email,
               unitName: item.unit,

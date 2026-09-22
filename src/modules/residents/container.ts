@@ -1,5 +1,5 @@
 import { UserRepository } from "../auth/infrastructure/repositories/UserRepository";
-import { NodemailerEmailService } from "../auth/infrastructure/services/NodemailerEmailService";
+import { SesEmailService } from "../auth/infrastructure/services/SesEmailService";
 import { CognitoAuthService } from "../auth/infrastructure/services/CognitoAuthService";
 import { CreateResidentUseCase } from "./application/use-cases/CreateResidentUseCase";
 import { DeactivateResidentUseCase } from "./application/use-cases/DeactivateResidentUseCase";
@@ -14,7 +14,7 @@ import { ResidentController } from "./presentation/controllers/ResidentControlle
 
 const residentRepository = new ResidentRepository();
 const userRepository = new UserRepository();
-const emailService = new NodemailerEmailService();
+const emailService = new SesEmailService();
 const cognitoAuthService = new CognitoAuthService();
 
 const createResidentUseCase = new CreateResidentUseCase(

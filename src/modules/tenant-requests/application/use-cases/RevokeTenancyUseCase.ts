@@ -118,7 +118,7 @@ export class RevokeTenancyUseCase {
         }
       }
 
-      const { subject, html } = buildTenancyRevokedEmailTemplate({
+      const { subject, html } = await buildTenancyRevokedEmailTemplate({
         name: tenantName,
         unitName,
         preferredLanguage: tenantUser?.preferredLanguage,
