@@ -76,6 +76,21 @@ router.post(
   documentRequestController.uploadDocument,
 );
 
+//S3 Direct Upload (Presigned POST)
+router.post(
+  "/:id/upload-url",
+  jwtMiddleware,
+  rbacMiddleware(UserRole.RESIDENT, UserRole.ADMIN),
+  documentRequestController.getUploadUrl,
+);
+
+router.post(
+  "/:id/confirm-upload",
+  jwtMiddleware,
+  rbacMiddleware(UserRole.RESIDENT, UserRole.ADMIN),
+  documentRequestController.confirmUpload,
+);
+
 router.post(
   "/:id/reject",
   jwtMiddleware,
@@ -89,6 +104,13 @@ router.delete(
   jwtMiddleware,
   rbacMiddleware(UserRole.RESIDENT, UserRole.ADMIN),
   documentRequestController.cancelRequest,
+);
+
+router.get(
+  "/:id/download-url",
+  jwtMiddleware,
+  rbacMiddleware(UserRole.RESIDENT, UserRole.ADMIN),
+  documentRequestController.getDownloadUrl,
 );
 
 /*
