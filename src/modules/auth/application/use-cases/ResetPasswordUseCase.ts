@@ -4,7 +4,8 @@ import { UserNotFoundError } from "../../domain/errors/AuthErrors";
 import { UserResponseDto } from "../dtos/UserResponseDto";
 import { IResidentRepository } from "../../../residents/domain/repositories/IResidentRepository";
 import { CognitoAuthService } from "../../infrastructure/services/CognitoAuthService";
-import { User } from "../../domain/entities/User";
+import { otpStore } from "../../infrastructure/services/OtpStore";
+import { AppError } from "../../../../shared/errors/AppError";
 
 export interface ResetPasswordResult {
   accessToken: string;
@@ -25,7 +26,13 @@ export class ResetPasswordUseCase {
       throw new UserNotFoundError();
     }
 
-    await this.cognitoAuthService.confirmForgotPassword(dto.email, dto.code, dto.newPassword);
+    if (!otpStore.verify(user.email, dto.code)) {
+      throw new AppError("Invalid or expired verification code.", 400);
+    }
+
+    await this.cognitoAuthService.adminSetUserPassword(user.email, dto.newPassword);
+
+    otpStore.delete(user.email);
 
     if (user.mustResetPassword) {
       user.clearPasswordReset();
@@ -57,4 +64,4 @@ export class ResetPasswordUseCase {
       },
     };
   }
-}
+}

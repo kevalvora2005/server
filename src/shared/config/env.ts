@@ -57,5 +57,5 @@ export const env = {
     process.env.S3_BUCKET_NAME || "",
 
   SES_FROM_EMAIL:
-    process.env.SES_FROM_EMAIL || "no-reply@civichorizon.com",
+    process.env.SES_FROM_EMAIL,
 };

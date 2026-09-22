@@ -1,18 +1,18 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { emailTemplateService } from "../src/shared/services/email/EmailTemplateService";
+import { emailTemplateService } from "../src/shared/services/EmailTemplateService";
 
 async function main() {
   console.log("Starting S3 Email Templates sync...");
-  const templates = ["welcome", "tenancy-revoked"];
+  const templates = ["welcome", "tenancy-revoked", "password-reset"];
 
   for (const template of templates) {
     try {
       await emailTemplateService.uploadTemplateToS3(template);
-      console.log(`✓ Successfully uploaded ${template}.html to S3`);
+      console.log(`Successfully uploaded ${template}.html to S3`);
     } catch (err: any) {
-      console.error(`✗ Failed to upload ${template}.html:`, err.message);
+      console.error(`Failed to upload ${template}.html:`, err.message);
     }
   }
 

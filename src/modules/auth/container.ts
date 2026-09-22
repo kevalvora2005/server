@@ -23,7 +23,7 @@ const loginUseCase = new LoginUseCase(userRepository, cognitoAuthService, reside
 const refreshTokenUseCase = new RefreshTokenUseCase(userRepository, cognitoAuthService, residentRepository);
 const logoutUseCase = new LogoutUseCase(cognitoAuthService);
 const getCurrentUserUseCase = new GetCurrentUserUseCase(userRepository, residentRepository);
-const forgotPasswordUseCase = new ForgotPasswordUseCase(userRepository, cognitoAuthService);
+const forgotPasswordUseCase = new ForgotPasswordUseCase(userRepository, emailService);
 const resetPasswordUseCase = new ResetPasswordUseCase(
   userRepository,
   cognitoAuthService,

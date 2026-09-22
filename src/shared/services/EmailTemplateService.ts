@@ -1,7 +1,7 @@
 import { S3Client, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import fs from "fs/promises";
 import path from "path";
-import { env } from "../../config/env";
+import { env } from "../config/env";
 
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes cache
 const S3_PREFIX = "email-templates";
@@ -25,9 +25,6 @@ export class EmailTemplateService {
     this.localTemplatesDir = path.resolve(__dirname, "../../templates/email");
   }
 
-  /**
-   * Fetches the raw HTML template from S3 (with in-memory cache and local fallback)
-   */
   async getTemplateHtml(templateName: string): Promise<string> {
     const cached = this.cache.get(templateName);
     if (cached && Date.now() - cached.cachedAt < CACHE_TTL_MS) {
@@ -36,7 +33,6 @@ export class EmailTemplateService {
 
     let html: string | null = null;
 
-    // 1. Try to fetch from S3
     if (env.S3_BUCKET_NAME) {
       try {
         const s3Key = `${S3_PREFIX}/${templateName}.html`;
@@ -57,7 +53,6 @@ export class EmailTemplateService {
       }
     }
 
-    // 2. Fallback to local .html file if S3 failed or returned empty
     if (!html) {
       const localFilePath = path.join(this.localTemplatesDir, `${templateName}.html`);
       try {
@@ -70,14 +65,10 @@ export class EmailTemplateService {
       }
     }
 
-    // Save to cache
     this.cache.set(templateName, { html, cachedAt: Date.now() });
     return html;
   }
 
-  /**
-   * Renders the template by replacing {{variable}} placeholders with provided data
-   */
   async render(templateName: string, data: Record<string, any>): Promise<string> {
     const templateHtml = await this.getTemplateHtml(templateName);
 
@@ -86,9 +77,7 @@ export class EmailTemplateService {
     });
   }
 
-  /**
-   * Helper to upload a local template file to S3
-   */
+
   async uploadTemplateToS3(templateName: string): Promise<void> {
     if (!env.S3_BUCKET_NAME) {
       throw new Error("[EmailTemplateService] S3_BUCKET_NAME is not configured");
@@ -107,7 +96,6 @@ export class EmailTemplateService {
       })
     );
 
-    // Invalidate local cache so next fetch gets latest from S3
     this.cache.delete(templateName);
     console.log(`[EmailTemplateService] Uploaded "${templateName}.html" to s3://${env.S3_BUCKET_NAME}/${s3Key}`);
   }

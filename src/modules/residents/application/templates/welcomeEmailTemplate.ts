@@ -1,5 +1,5 @@
 import i18n from "../../../../shared/config/i18n";
-import { emailTemplateService } from "../../../../shared/services/email/EmailTemplateService";
+import { emailTemplateService } from "../../../../shared/services/EmailTemplateService";
 
 export interface WelcomeEmailTemplateOptions {
   name: string;
