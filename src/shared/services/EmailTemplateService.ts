@@ -58,7 +58,7 @@ export class EmailTemplateService {
       try {
         html = await fs.readFile(localFilePath, "utf-8");
         console.log(`[EmailTemplateService] Loaded template "${templateName}" from local fallback`);
-      } catch (localErr: any) {
+      } catch (err: any) {
         throw new Error(
           `[EmailTemplateService] Template "${templateName}" not found in S3 or local directory (${localFilePath})`
         );
@@ -69,7 +69,7 @@ export class EmailTemplateService {
     return html;
   }
 
-  async render(templateName: string, data: Record<string, any>): Promise<string> {
+  async render(templateName: string, data: Record<string, unknown>): Promise<string> {
     const templateHtml = await this.getTemplateHtml(templateName);
 
     return templateHtml.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_, key) => {

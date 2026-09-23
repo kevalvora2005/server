@@ -14,7 +14,7 @@ export async function buildPasswordResetEmailTemplate(options: PasswordResetEmai
 }> {
   const societyName = options.societyName || process.env.SOCIETY_NAME || "Civic Horizon";
   const lng = options.preferredLanguage || "en";
-  const t = (key: string, opts: Record<string, any> = {}) => i18n.t(key, { lng, ...opts });
+  const t = (key: string, opts: Record<string, unknown> = {}) => i18n.t(key, { lng, ...opts });
 
   const subject = t("email.password_reset_subject", { societyName });
 

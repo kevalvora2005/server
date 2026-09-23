@@ -15,7 +15,7 @@ export class BookingNotifier implements IBookingNotifier {
     type: NotificationType,
     title: string,
     body: string,
-    data?: Record<string, any>
+    data?: Record<string, unknown>
   ): Promise<void> {
     try {
       const resident = await this.residentRepository.findById(booking.residentId);
@@ -35,7 +35,7 @@ export class BookingNotifier implements IBookingNotifier {
     type: NotificationType,
     title: string,
     body: string,
-    data?: Record<string, any>
+    data?: Record<string, unknown>
   ): Promise<void> {
     try {
       const admins = await UserModel.findAll({ where: { role: UserRole.ADMIN } });

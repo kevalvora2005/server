@@ -13,7 +13,7 @@ export class ComplaintNotifier implements IComplaintNotifier {
 
       const ticketNumber = `#CMP-${String(complaint.id).padStart(4, "0")}`;
       let key = "notification.complaint_status_changed";
-      let params: Record<string, any> = { ticketNumber, status: complaint.status };
+      let params: Record<string, unknown> = { ticketNumber, status: complaint.status };
 
       if (complaint.status === "Resolved") {
         key = "notification.complaint_resolved";

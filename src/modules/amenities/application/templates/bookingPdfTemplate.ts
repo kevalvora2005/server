@@ -16,7 +16,7 @@ export function buildBookingPdfTemplate(options: BuildBookingPdfTemplateOptions)
   const lng = options.language!;
   const loc = booking.resident?.locale || "en-IN"; // safety net only if resident is null
 
-  const t = (key: string, opts: Record<string, any> = {}) =>
+  const t = (key: string, opts: Record<string, unknown> = {}) =>
     i18n.t(key, { lng, ...opts });
 
   const paidDate = booking.paidAt

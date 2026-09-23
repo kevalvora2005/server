@@ -60,7 +60,7 @@ export class DocumentRequestNotifier implements IDocumentRequestNotifier {
       let body = `Your document request for "${docName}" status changed to ${request.status}.`;
       let type: "document_request_status_changed" | "document_request_approved" | "document_request_uploaded" | "document_request_rejected" = "document_request_status_changed";
       let key = "notification.document_request_status_changed";
-      let params: Record<string, any> = { docName, status: request.status };
+      let params: Record<string, unknown> = { docName, status: request.status };
 
       if (request.status === DocumentRequestStatus.APPROVED) {
         type = "document_request_approved";

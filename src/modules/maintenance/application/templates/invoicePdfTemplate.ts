@@ -21,7 +21,7 @@ export function buildInvoicePdfTemplate(options: BuildInvoicePdfTemplateOptions)
   const lng = options.language!;
   const loc = residentUser?.locale || "en-IN";
 
-  const t = (key: string, opts: Record<string, any> = {}) =>
+  const t = (key: string, opts: Record<string, unknown> = {}) =>
     i18n.t(key, { lng, ...opts });
 
   const monthName = new Date(invoice.year, invoice.month - 1).toLocaleString(loc, { month: "long" });

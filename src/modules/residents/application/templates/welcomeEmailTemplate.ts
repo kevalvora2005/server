@@ -19,7 +19,7 @@ export async function buildWelcomeEmailTemplate(options: WelcomeEmailTemplateOpt
   const societyName = options.societyName || process.env.SOCIETY_NAME || "Civic Horizon";
   const clientUrl = options.clientUrl || process.env.CLIENT_URL || "http://localhost:5173";
   const lng = options.preferredLanguage || "en";
-  const t = (key: string, opts: Record<string, any> = {}) => i18n.t(key, { lng, ...opts });
+  const t = (key: string, opts: Record<string, unknown> = {}) => i18n.t(key, { lng, ...opts });
 
   const subject = t("email.welcome_subject", { societyName });
 

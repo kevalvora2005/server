@@ -15,7 +15,7 @@ export async function buildTenancyRevokedEmailTemplate(options: TenancyRevokedEm
 }> {
   const societyName = options.societyName || process.env.SOCIETY_NAME || "Civic Horizon";
   const lng = options.preferredLanguage || "en";
-  const t = (key: string, opts: Record<string, any> = {}) => i18n.t(key, { lng, ...opts });
+  const t = (key: string, opts: Record<string, unknown> = {}) => i18n.t(key, { lng, ...opts });
 
   const subject = t("email.tenancy_revoked_subject", { societyName });
 

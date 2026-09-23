@@ -86,7 +86,7 @@ export class S3PresignedPostService {
     return `https://${this.bucketName}.s3.${env.AWS_REGION}.amazonaws.com/${key}`;
   }
 
-  async generatePresignedGetUrl(key: string, expiresInSeconds: number = 3600): Promise<string> {
+  async generatePresignedGetUrl(key: string, expiresInSeconds: number = 300): Promise<string> {
     const command = new GetObjectCommand({
       Bucket: this.bucketName,
       Key: key,
